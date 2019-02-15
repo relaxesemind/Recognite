@@ -10,7 +10,7 @@ QImage Core::imageFromTxtFile(const QString &path)
 
    InputModel model = parser.inputModelFromFile(path);
 
-   if (model.matrix.isEmpty())
+   if (!model.isValid())
    {
        return QImage();
    }
@@ -18,25 +18,19 @@ QImage Core::imageFromTxtFile(const QString &path)
    float max = std::numeric_limits<float>::min();
    float min = std::numeric_limits<float>::max();
 
-   int sizeY = model.matrix.size();
-   int sizeX = model.matrix.first().size();
+   int sizeY = model.sizeY();
+   int sizeX = model.sizeX();
 
-   for (int i = 0; i < sizeY; ++i)
+   model.foreachHeight([&max,&min](float& value)
    {
-       float maxNew = *std::max_element(model.matrix[i].begin(),model.matrix[i].end());
-       float minNew = *std::min_element(model.matrix[i].begin(),model.matrix[i].end());
+       max = value > max ? value : max;
+       min = value < min ? value : min;
+   });
 
-       max = maxNew > max ? maxNew : max;
-       min = minNew < min ? minNew : min;
-   }
-
-   for (int i = 0; i < sizeY; ++i)
+   model.foreachHeight([min](float& value)
    {
-       std::for_each(model.matrix[i].begin(),model.matrix[i].end(),[min](float& value)
-       {
-           value += std::abs(min);
-       });
-   }
+       value += std::abs(min);
+   });
 
    max += std::abs(min);
 
@@ -50,11 +44,11 @@ QImage Core::imageFromTxtFile(const QString &path)
                                         model.matrix[i][j] * 255.f /
                                         static_cast<float>(std::abs(max))
                                         );
-//            qDebug () << comp;
             QRgb value = qRgb(comp,comp,comp);
             image.setPixel(i,j,value);
        }
    }
+
    return image;
 }
 

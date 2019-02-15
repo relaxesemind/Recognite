@@ -5,13 +5,18 @@
 #include "diagramwindow.h"
 #include "Managers/parser.h"
 #include "core.h"
+#include "selectingprocessmanager.h"
 
 
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QDebug>
+#include <utility>
+#include <memory>
 #include <QPixmap>
 #include <QStringList>
+#include <QThreadPool>
+
 
 
 namespace Ui {
@@ -26,8 +31,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void addDestPair(QString,QImage);
+    void updateProcessPercentage(int);
+
 private slots:
-    void on_pushButton_2_clicked();
 
     void on_loadTxtFiles_triggered();
 
@@ -41,8 +49,19 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_tableWidget_clicked(const QModelIndex &index);
+
+    void on_processPushButton_clicked();
+
+private:
+    void updateTableWidget();
+    void makeImageFromFilePath(const QString& path);
+
 private:
     Ui::MainWindow *ui;
+    std::unique_ptr<QThreadPool> pool;
+    std::unique_ptr<SelectingProcessManager> selectingTask;
+    QVector<std::pair<QString,QImage>> sources, dests;
 };
 
 #endif // MAINWINDOW_H

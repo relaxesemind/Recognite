@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <algorithm>
 #include <limits>
+#include <cmath>
 #include <QVector>
 #include <QStack>
 #include <QPoint>

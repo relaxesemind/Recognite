@@ -20,15 +20,15 @@ TEMPLATE = app
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
-INCLUDEPATH += open_cv/include
+#INCLUDEPATH += open_cv/include
 
-LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_calib3d320.dll
-LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_core320.dll
-LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_features2d320.dll
-LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_highgui320.dll
-LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_imgcodecs320.dll
-LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_photo320.dll
-LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_imgproc320.dll
+#LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_calib3d320.dll
+#LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_core320.dll
+#LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_features2d320.dll
+#LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_highgui320.dll
+#LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_imgcodecs320.dll
+#LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_photo320.dll
+#LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_imgproc320.dll
 
 
 #LIBS += -lopencv_core341 -lopencv_imgproc341 -lopencv_highgui341 \
@@ -45,7 +45,8 @@ SOURCES += \
     grapher.cpp \
     diagramwindow.cpp \
     Models/inputmodel.cpp \
-    imageview.cpp
+    imageview.cpp \
+    selectingprocessmanager.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -57,7 +58,8 @@ HEADERS += \
     diagramwindow.h \
     Models/inputmodel.h \
     imageview.h \
-    Models/models.h
+    Models/models.h \
+    selectingprocessmanager.h
 
 FORMS += \
         mainwindow.ui \
