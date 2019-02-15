@@ -59,7 +59,8 @@ HEADERS += \
     Models/inputmodel.h \
     imageview.h \
     Models/models.h \
-    selectingprocessmanager.h
+    selectingprocessmanager.h \
+    Common/consts.h
 
 FORMS += \
         mainwindow.ui \

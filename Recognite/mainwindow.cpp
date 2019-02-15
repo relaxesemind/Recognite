@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->menuBar->setNativeMenuBar(false);
+    pool = new QThreadPool(this);
+
     ui->listWidget->addItems(QStringList
     {
          "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
@@ -29,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete selectingTask;
+    delete pool;
     delete ui;
 }
 
@@ -44,6 +48,18 @@ void MainWindow::updateProcessPercentage(int value)
     if (value == 100)
     {
         bar->setValue(0);
+        QList<QTableWidgetItem *> list = ui->tableWidget->selectedItems();
+        if (list.isEmpty())
+        {
+            return;
+        }
+
+        int id = list.first()->column();
+        if (id < 0 or id > dests.count() - 1)
+        {
+            return;
+        }
+        ui->imageViewSelected->setImage(QPixmap::fromImage(dests[id].second));
     }
     else
     {
@@ -183,10 +199,11 @@ void MainWindow::on_processPushButton_clicked()
         return;
     }
 
-    if (selectingTask and selectingTask->isRunning())
-    {
-        return;
-    }
+//    if (selectingTask and selectingTask->isRunning())
+//    {
+//        qDebug () << "task is running";
+//        return;
+//    }
 
     int min = ui->minHeightLineEdit->text().toInt();
     int max = ui->maxHeightLineEdit->text().toInt();
@@ -204,13 +221,13 @@ void MainWindow::on_processPushButton_clicked()
         return;
     }
 
-    pool = std::make_unique<QThreadPool>(this);
-    selectingTask = std::make_unique<SelectingProcessManager>(paths,this);
+    this->dests.clear();
+    selectingTask = new SelectingProcessManager(paths,this);
 
-    connect(selectingTask.get(),&SelectingProcessManager::destPair,this,&MainWindow::addDestPair);
-    connect(selectingTask.get(),&SelectingProcessManager::processPercent,this,&MainWindow::updateProcessPercentage);
+    connect(selectingTask,&SelectingProcessManager::destPair,this,&MainWindow::addDestPair);
+    connect(selectingTask,&SelectingProcessManager::processPercent,this,&MainWindow::updateProcessPercentage);
 
-    pool->start(selectingTask.get());
+    pool->start(selectingTask);
 }
 
 

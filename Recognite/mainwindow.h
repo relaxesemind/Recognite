@@ -59,8 +59,8 @@ private:
 
 private:
     Ui::MainWindow *ui;
-    std::unique_ptr<QThreadPool> pool;
-    std::unique_ptr<SelectingProcessManager> selectingTask;
+    QThreadPool *pool;
+    SelectingProcessManager *selectingTask;
     QVector<std::pair<QString,QImage>> sources, dests;
 };
 

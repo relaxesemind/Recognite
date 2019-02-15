@@ -3,6 +3,7 @@
 SelectingProcessManager::SelectingProcessManager(const QStringList &paths, QObject *parent) : QObject(parent), paths(paths)
 {
     status = false;
+    setAutoDelete(true);
 }
 
 bool SelectingProcessManager::isRunning()
@@ -13,6 +14,7 @@ bool SelectingProcessManager::isRunning()
 void SelectingProcessManager::run()
 {
     status = true;
+    qDebug ()  << " true";
     for (int i = 0; i < paths.count(); ++i)
     {
        QString path = paths.at(i);
@@ -21,4 +23,5 @@ void SelectingProcessManager::run()
        emit processPercent((1 + i) * 100 / paths.count());
     }
     status = false;
+    qDebug()  << " false";
 }
