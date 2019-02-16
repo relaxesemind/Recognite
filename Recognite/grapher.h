@@ -22,7 +22,6 @@ private:
     Grapher(const Grapher&);
     Grapher operator=(Grapher&);
 public:
-//    ~Grapher();
     static Grapher& shared() {
         static Grapher service;
         return service;

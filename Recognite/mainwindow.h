@@ -6,6 +6,7 @@
 #include "Managers/parser.h"
 #include "core.h"
 #include "selectingprocessmanager.h"
+#include "staticmodel.h"
 
 
 #include <QMainWindow>
@@ -32,8 +33,8 @@ public:
     ~MainWindow();
 
 public slots:
-    void addDestPair(QString,QImage);
     void updateProcessPercentage(int);
+    void enableDiagramButton(bool);
 
 private slots:
 
@@ -53,6 +54,8 @@ private slots:
 
     void on_processPushButton_clicked();
 
+    void on_diagramPushButton_clicked();
+
 private:
     void updateTableWidget();
     void makeImageFromFilePath(const QString& path);
@@ -61,7 +64,6 @@ private:
     Ui::MainWindow *ui;
     QThreadPool *pool;
     SelectingProcessManager *selectingTask;
-    QVector<std::pair<QString,QImage>> sources, dests;
 };
 
 #endif // MAINWINDOW_H

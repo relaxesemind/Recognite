@@ -16,6 +16,9 @@ public:
     explicit DiagramWindow(QWidget *parent = 0);
     ~DiagramWindow();
 
+private slots:
+    void on_horizontalSlider_valueChanged(int value);
+
 private:
     Ui::DiagramWindow *ui;
 };

@@ -1,6 +1,8 @@
 #ifndef IMAGEVIEW_H
 #define IMAGEVIEW_H
 
+#include "Common/consts.h"
+
 #include <QObject>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>

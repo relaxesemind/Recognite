@@ -2,6 +2,7 @@
 #define SELECTINGPROCESSMANAGER_H
 
 #include "core.h"
+#include "staticmodel.h"
 
 #include <QObject>
 #include <QRunnable>
@@ -23,7 +24,8 @@ protected:
 
 signals:
     void processPercent(int);
-    void destPair(QString,QImage);
+    void setEnableDiagram(bool);
+    void destPair(const QString&,const QImage&);
 
 public slots:
 

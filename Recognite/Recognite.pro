@@ -46,7 +46,8 @@ SOURCES += \
     diagramwindow.cpp \
     Models/inputmodel.cpp \
     imageview.cpp \
-    selectingprocessmanager.cpp
+    selectingprocessmanager.cpp \
+    staticmodel.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -60,7 +61,8 @@ HEADERS += \
     imageview.h \
     Models/models.h \
     selectingprocessmanager.h \
-    Common/consts.h
+    Common/consts.h \
+    staticmodel.h
 
 FORMS += \
         mainwindow.ui \

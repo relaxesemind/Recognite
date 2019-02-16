@@ -72,7 +72,7 @@
          <bool>true</bool>
         </property>
         <attribute name="horizontalHeaderVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
@@ -117,9 +117,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="diagramPushButton">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="minimumSize">
            <size>
@@ -277,7 +277,7 @@
                  <number>5</number>
                 </property>
                 <property name="value">
-                 <number>40</number>
+                 <number>115</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -293,7 +293,7 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>40</string>
+                 <string>115</string>
                 </property>
                </widget>
               </item>
@@ -335,7 +335,7 @@
                  <number>5</number>
                 </property>
                 <property name="value">
-                 <number>120</number>
+                 <number>255</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -351,7 +351,7 @@
                  </size>
                 </property>
                 <property name="text">
-                 <string>120</string>
+                 <string>255</string>
                 </property>
                </widget>
               </item>
@@ -360,7 +360,7 @@
            </layout>
           </widget>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>20</x>

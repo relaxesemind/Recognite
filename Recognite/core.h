@@ -18,6 +18,7 @@
 #include "Models/models.h"
 #include "Managers/parser.h"
 #include "Common/consts.h"
+#include "staticmodel.h"
 
 
 class Core : public QObject
@@ -29,6 +30,8 @@ public:
     QImage imageFromTxtFile(const QString& path);
     QImage binImageFromTxtFile(const QString& path);
     void setRange(int min, int max);
+    std::pair<float,float> findAbsoluteMaxMinHeights();
+
 
 signals:
 
@@ -41,6 +44,7 @@ private:
     int rangeMin;
     bool inRange(qint32 x, qint32 y, const InputModel& model);
     void fill(const InputModel& model, QVector<QVector<qint32>>& V, qint32 x, qint32 y, qint32 L);
+    void formObjects();
 };
 
 #endif // CORE_H

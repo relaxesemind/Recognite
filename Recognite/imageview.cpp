@@ -13,13 +13,15 @@ void ImageView::wheelEvent(QWheelEvent *event)
     }
 
     QPoint degrees = event->angleDelta() / 8;
+    qreal zoom = Consts::zoomMultiple;
+
     if (degrees.y() > 0)
     {
-        scale(1.05,1.05);
+        scale(zoom,zoom);
     }
     else
     {
-        scale(1/1.05,1/1.05);
+        scale(1 / zoom,1 / zoom);
     }
 }
 

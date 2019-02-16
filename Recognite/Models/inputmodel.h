@@ -14,7 +14,7 @@ struct InputModel
 
     template<class lambda> void foreachHeight(lambda call)
     {
-        for (int i = 0; i < matrix.size();++i)
+        for (int i = 0; i < matrix.size(); ++i)
         {
             std::for_each(matrix[i].begin(),matrix[i].end(),call);
         }

@@ -36,14 +36,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::addDestPair(QString path, QImage image)
-{
-    dests.append(std::make_pair(path,image));
-}
-
 void MainWindow::updateProcessPercentage(int value)
 {
     QProgressBar *bar = ui->progressBar;
+    auto& dests = StaticModel::shared().dests;
+
     bar->setTextVisible(true);
     if (value == 100)
     {
@@ -67,10 +64,15 @@ void MainWindow::updateProcessPercentage(int value)
     }
 }
 
+void MainWindow::enableDiagramButton(bool flag)
+{
+    ui->diagramPushButton->setEnabled(flag);
+}
+
 void MainWindow::makeImageFromFilePath(const QString &path)
 {
     QImage image = Core::shared().imageFromTxtFile(path);
-
+    auto& sources = StaticModel::shared().sources;
     auto pair = std::make_pair(path,image);
 
     if (std::find(sources.begin(),sources.end(), pair) == sources.end())
@@ -158,6 +160,7 @@ void MainWindow::on_pushButton_clicked()//build images
 void MainWindow::updateTableWidget()
 {
     QTableWidget *table = ui->tableWidget;
+    auto& sources = StaticModel::shared().sources;
 
     table->setColumnCount(sources.count());
     table->setRowCount(1);
@@ -175,6 +178,8 @@ void MainWindow::updateTableWidget()
 void MainWindow::on_tableWidget_clicked(const QModelIndex &index)
 {
     int id = index.column();
+    auto& sources = StaticModel::shared().sources;
+    auto& dests = StaticModel::shared().dests;
 
     if (id < 0 or id > sources.count() - 1)
     {
@@ -193,17 +198,20 @@ void MainWindow::on_tableWidget_clicked(const QModelIndex &index)
 
 void MainWindow::on_processPushButton_clicked()
 {
+    auto& sources = StaticModel::shared().sources;
+    auto& dests = StaticModel::shared().dests;
+
     if (sources.isEmpty())
     {
         AppMessage("Ошибка","Изображения отсутствуют");
         return;
     }
 
-//    if (selectingTask and selectingTask->isRunning())
-//    {
-//        qDebug () << "task is running";
-//        return;
-//    }
+    if (selectingTask and selectingTask->isRunning())
+    {
+        qDebug () << "task is running";
+        return;
+    }
 
     int min = ui->minHeightLineEdit->text().toInt();
     int max = ui->maxHeightLineEdit->text().toInt();
@@ -221,25 +229,25 @@ void MainWindow::on_processPushButton_clicked()
         return;
     }
 
-    this->dests.clear();
+    dests.clear();
     selectingTask = new SelectingProcessManager(paths,this);
 
-    connect(selectingTask,&SelectingProcessManager::destPair,this,&MainWindow::addDestPair);
+    connect(selectingTask,&SelectingProcessManager::destPair,&StaticModel::shared(),&StaticModel::addDestPair);
+    connect(selectingTask,&SelectingProcessManager::setEnableDiagram,this,&MainWindow::enableDiagramButton);
     connect(selectingTask,&SelectingProcessManager::processPercent,this,&MainWindow::updateProcessPercentage);
 
     pool->start(selectingTask);
 }
 
 
+void MainWindow::on_diagramPushButton_clicked()
+{
+//    DiagramWindow *diagram = new DiagramWindow(this);
 
-
-
-
-
-
-
-
-
+//    diagram->show();
+    auto pair = Core::shared().findAbsoluteMaxMinHeights();
+    qDebug() << "max = " << pair.first << " min = " << pair.second;
+}
 
 
 

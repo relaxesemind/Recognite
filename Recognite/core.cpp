@@ -60,10 +60,29 @@ void Core::setRange(int min, int max)
     rangeMax = max;
 }
 
+std::pair<float, float> Core::findAbsoluteMaxMinHeights()
+{
+    auto& objects = StaticModel::shared().objectsMap;
+    float min = std::numeric_limits<float>::max();
+    float max = std::numeric_limits<float>::min();
+
+    std::for_each(objects.begin(),objects.end(),[&min, &max](QVector<Area>& singleImageObjects)
+    {
+        std::for_each(singleImageObjects.begin(),singleImageObjects.end(),[&min,&max](Area& area)
+        {
+            float center = area.getCenterPoint().height;
+            max = center > max ? center : max;
+            min = center < min ? center : min;
+        });
+    });
+
+    return std::make_pair(max,min);
+}
+
 inline bool Core::inRange(qint32 x, qint32 y, const InputModel& model)
 {
     int comp = model.colorOfHeight(x,y);
-    return /* (comp <= rangeMax) and */(comp >= rangeMin);
+    return  (comp <= rangeMax) and (comp >= rangeMin);
 }
 
 void Core::fill(const InputModel &model, QVector<QVector<qint32>>& V, qint32 x, qint32 y, qint32 L)
@@ -148,14 +167,26 @@ QImage Core::binImageFromTxtFile(const QString &path)
       }
 
 //form objects
-//    for (int i = 0; i < _h; ++i)
-//    {
-//        for (int j = 0; j < _w; ++j)
-//        {
-//            std::cout<<labels[i][j] << " ";
-//        }
-//        std::cout<<std::endl;
-//    }
+
+    const qint32 size = --L; // size == num of objects
+    QVector<Area> objects(size, Area());
+
+       if ((size > 0) && (_h > 2) && (_w > 2))
+       {
+           for(int y = 0; y < _h; ++y)
+             for(int x = 0; x < _w; ++x)
+             {
+                 qint32 id = labels[y][x];
+                 if ((id > 0) && (id < size + 1))
+                 {
+                   objects[id - 1].addPoint(HeightCoordinate(x,y,model.matrix[y][x]));
+                 }
+             }
+        }
+
+    StaticModel::shared().objectsMap.insert(model.path,std::move(objects));
+
+//form image
 
     QImage image(_w,_h,QImage::Format_RGB32);
 
@@ -163,8 +194,6 @@ QImage Core::binImageFromTxtFile(const QString &path)
     {
         for (int j = 0; j < _w; ++j)
         {
-//            int value = labels[i][j];
-//            image.setPixel(i,j,qRgb(value,value,value));
              if (labels[i][j])
              {
                 image.setPixel(i,j,Consts::whiteRgb);

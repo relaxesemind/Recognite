@@ -3,6 +3,43 @@
 
 #include <QVector>
 #include <QPoint>
+#include <algorithm>
+#include <math.h>
+#include <limits>
+
+
+struct HeightCoordinate
+{
+    HeightCoordinate() = default;
+    HeightCoordinate(int x, int y, float height): x(x), y(y), height(height) {}
+    HeightCoordinate(QPoint point, float height): x(point.x()), y(point.y()), height(height) {}
+
+    HeightCoordinate& operator=(const HeightCoordinate& obj)
+    {
+        if (this == &obj)
+        {
+            return *this;
+        }
+
+        x = obj.x;
+        y = obj.y;
+        height = obj.height;
+        return *this;
+    }
+
+    bool operator==(const HeightCoordinate& rvalue)
+    {
+        return x == rvalue.x and  y == rvalue.y and height == rvalue.height;
+    }
+
+    bool operator!=(const HeightCoordinate& rvalue)
+    {
+        return *this == rvalue;
+    }
+
+    int x, y;
+    float height;
+};
 
 struct Area
 {
@@ -21,13 +58,18 @@ struct Area
         return *this;
     }
 
-    void addPoint(QPoint point)
+    void addPoint(const HeightCoordinate& point)
     {
         points.append(point);
     }
 
+    HeightCoordinate getCenterPoint();
+
     qint32 id;
-    QVector<QPoint> points;
+    QVector<HeightCoordinate> points;
+
+private:
+    HeightCoordinate centerCoord;
 };
 
 

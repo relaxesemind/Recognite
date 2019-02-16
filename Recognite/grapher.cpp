@@ -27,7 +27,7 @@ Grapher::Grapher()
 //   delete chart;
 //}
 
-void Grapher::addPointsAtGraph(const QVector<QPointF> &points)
+void Grapher::addPointsAtGraph(const QVector<QPointF>& points)
 {
   /*  QScatterSeries *series = new QScatterSeries();
     for (QPointF &p : points) {
