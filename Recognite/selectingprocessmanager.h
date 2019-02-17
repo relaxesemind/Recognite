@@ -16,8 +16,8 @@ class SelectingProcessManager : public QObject, public QRunnable
     Q_OBJECT
 
 public:
-    explicit SelectingProcessManager(const QStringList& paths, QObject *parent = nullptr);
-    bool isRunning();
+    explicit SelectingProcessManager(const QStringList& paths);
+    ~SelectingProcessManager(){}
 
 protected:
     void run();
@@ -26,12 +26,12 @@ signals:
     void processPercent(int);
     void setEnableDiagram(bool);
     void destPair(const QString&,const QImage&);
+    void isRunning(bool);
 
 public slots:
 
 private:
     QStringList paths;
-    bool status;
 };
 
 #endif // SELECTINGPROCESSMANAGER_H

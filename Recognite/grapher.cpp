@@ -8,17 +8,6 @@ Grapher::Grapher()
     view->setChart(chart);
     view->setRenderHint(QPainter::Antialiasing);
     view->setRubberBand(QChartView::RectangleRubberBand);
-
-    QScatterSeries *pointSeria = new QScatterSeries();
-    pointSeria->append(QPoint(1,1));
-    QColor color;
-    color.setNamedColor("red");
-    pointSeria->setColor(color);
-    pointSeria->setName("unknown");
-    pointSeria->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    pointSeria->setMarkerSize(20.0);
-    chart->addSeries(pointSeria);
-    chart->createDefaultAxes();
 }
 
 //Grapher::~Grapher()
@@ -29,43 +18,52 @@ Grapher::Grapher()
 
 void Grapher::addPointsAtGraph(const QVector<QPointF>& points)
 {
-  /*  QScatterSeries *series = new QScatterSeries();
-    for (QPointF &p : points) {
+    QSplineSeries *series = new QSplineSeries();
+
+    chart->legend()->hide();
+    QFont font;
+    font.setPixelSize(18);
+    chart->setTitleFont(font);
+    chart->setTitleBrush(QBrush(Qt::black));
+    chart->setTitle("Диаграмма высот в процентах от максимальной высоты");
+
+    QValueAxis *axisX = new QValueAxis();
+    QValueAxis *axisY = new QValueAxis();
+
+    axisY->setMax(100);
+    axisY->setMin(0);
+
+    axisX->setMin(0);
+    axisX->setMax(points.size() - 1);
+
+    axisY->setMinorTickCount(5);
+
+    axisX->setLabelFormat("%i");
+    axisY->setLabelFormat("%i%%");
+
+    chart->setAxisX(axisX);
+    chart->setAxisY(axisY);
+
+    for (QPointF p : points)
+    {
         series->append(p);
     }
-    series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    series->setMarkerSize(10.0);
 
-            QColor color;
-            switch (type) {
-            case CellType::Blast:
-                 color.setNamedColor("orange");
-                 series->setName("Бласт");
-                break;
-            case CellType::NoBlast :
-                color.setNamedColor("green");
-                series->setName("Не Бласт");
-                break;
-            }
-
-            series->setColor(color);
-            chart->addSeries(series);
-            chart->createDefaultAxes()
-            ///
-    QScatterSeries *pointSeria = new QScatterSeries();
-    pointSeria->append(point);
+//    series->setMarkerShape(QSplineSeries::SeriesTypeLine);
+//    series->setMarkerSize(10.0);
     QColor color;
     color.setNamedColor("red");
-    pointSeria->setColor(color);
-    pointSeria->setName("unknown");
-    pointSeria->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    pointSeria->setMarkerSize(20.0);
-    chart->addSeries(pointSeria);
-    chart->createDefaultAxes();*/;
+    QPen pen(color);
+    pen.setWidthF(2.5);
+    series->setPen(pen);
+
+    chart->addSeries(series);
+
 
 }
 
 void Grapher::clearView()
 {
+    chart->removeAllSeries();
 
 }

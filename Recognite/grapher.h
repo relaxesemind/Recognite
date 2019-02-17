@@ -7,7 +7,8 @@
 #include <QVector>
 #include <QPointF>
 #include <QtCharts/QChartView>
-#include <QtCharts/QScatterSeries>
+#include <QtCharts/QSplineSeries>
+#include <QtCharts/QValueAxis>
 
 
 using namespace QtCharts;

@@ -1,19 +1,16 @@
 #include "selectingprocessmanager.h"
 
-SelectingProcessManager::SelectingProcessManager(const QStringList &paths, QObject *parent) : QObject(parent), paths(paths)
+SelectingProcessManager::SelectingProcessManager(const QStringList &paths) : paths(paths)
 {
-    status = false;
-    setAutoDelete(true);
+
 }
 
-bool SelectingProcessManager::isRunning()
-{
-    return status;
-}
+
 
 void SelectingProcessManager::run()
 {
-    status = true;
+    emit isRunning(true);
+    emit setEnableDiagram(false);
 
     StaticModel::shared().objectsMap.clear();
 
@@ -32,5 +29,5 @@ void SelectingProcessManager::run()
 
     emit setEnableDiagram(!StaticModel::shared().objectsMap.isEmpty());
 
-    status = false;
+    emit isRunning(false);
 }

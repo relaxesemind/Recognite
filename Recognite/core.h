@@ -14,6 +14,7 @@
 #include <QPoint>
 #include <QByteArray>
 #include <QRgb>
+#include <QPointF>
 #include "Common/magic.h"
 #include "Models/models.h"
 #include "Managers/parser.h"
@@ -31,6 +32,8 @@ public:
     QImage binImageFromTxtFile(const QString& path);
     void setRange(int min, int max);
     std::pair<float,float> findAbsoluteMaxMinHeights();
+    void calculateFrequencies(int numOfColumn);
+    QVector<QPointF> calcPointsForGraph();
 
 
 signals:

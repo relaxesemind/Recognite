@@ -28,14 +28,14 @@ HeightCoordinate Area::getCenterPoint()
 
         int averageX = (maxX - minX) / 2;
         int averageY = (maxY - minY) / 2;
-        int minR = std::numeric_limits<int>::max();
+        float minR = std::numeric_limits<float>::max();
         int index = 0;
 
         for (int i = 0; i < points.count(); ++i)
         {
             int distanceX = std::abs(points[i].x - averageX);
             int distanceY = std::abs(points[i].y - averageY);
-            int radius = sqrt(pow(distanceX, 2) + pow(distanceY, 2));
+            float radius = sqrt(pow(distanceX, 2) + pow(distanceY, 2));
 
             if (radius < minR)
             {

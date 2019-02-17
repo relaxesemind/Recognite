@@ -79,6 +79,67 @@ std::pair<float, float> Core::findAbsoluteMaxMinHeights()
     return std::make_pair(max,min);
 }
 
+void Core::calculateFrequencies(int numOfColumn)
+{
+    if (numOfColumn <= 0)
+    {
+        return;
+    }
+
+    qDebug() << "start calculateFrequencies";
+
+    auto& objects = StaticModel::shared().objectsMap;
+    auto& frequencies = StaticModel::shared().frequencies;
+    float max = StaticModel::shared().absoluteMAXheight;
+    float min = StaticModel::shared().absoluteMINheight;
+
+
+    float singleInterval = (max - min) / numOfColumn;
+
+    qDebug() << "max = " << max << " min = " << min;
+    qDebug() << "singleInterval = " << singleInterval;
+    qDebug() << "objects num = " << objects.size();
+
+    frequencies.clear();
+    frequencies.resize(numOfColumn);
+
+    std::for_each(objects.begin(),objects.end(),[&](QVector<Area>& singleImageObjects)
+    {
+        std::for_each(singleImageObjects.begin(),singleImageObjects.end(),[&](Area& object)
+        {
+            float center = object.getCenterPoint().height;
+
+            int column = 0;
+
+            while(center > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
+            {
+                ++column;
+            }
+            if (column < frequencies.size() - 1)
+            {
+
+               ++frequencies[column];
+            }
+
+        });
+    });
+
+    qDebug() << "end calculateFrequencies";
+}
+
+QVector<QPointF> Core::calcPointsForGraph()
+{
+    auto& frequencies = StaticModel::shared().frequencies;
+    QVector<QPointF> result(frequencies.size());
+
+    repeat(i,frequencies.size())
+    {
+        result[i] = QPointF(i,frequencies[i]);
+    }
+
+    return result;
+}
+
 inline bool Core::inRange(qint32 x, qint32 y, const InputModel& model)
 {
     int comp = model.colorOfHeight(x,y);

@@ -35,6 +35,7 @@ public:
 public slots:
     void updateProcessPercentage(int);
     void enableDiagramButton(bool);
+    void setTaskIsRunning(bool);
 
 private slots:
 
@@ -64,6 +65,7 @@ private:
     Ui::MainWindow *ui;
     QThreadPool *pool;
     SelectingProcessManager *selectingTask;
+    bool taskIsRunning;
 };
 
 #endif // MAINWINDOW_H

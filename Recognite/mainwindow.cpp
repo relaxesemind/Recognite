@@ -4,34 +4,35 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    pool(new QThreadPool(this))
 {
     ui->setupUi(this);
     ui->menuBar->setNativeMenuBar(false);
-    pool = new QThreadPool(this);
+    selectingTask = nullptr;
+    taskIsRunning = false;
 
     ui->listWidget->addItems(QStringList
     {
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
+     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
    });
 }
 
 MainWindow::~MainWindow()
 {
-    delete selectingTask;
     delete pool;
     delete ui;
 }
@@ -69,6 +70,11 @@ void MainWindow::enableDiagramButton(bool flag)
     ui->diagramPushButton->setEnabled(flag);
 }
 
+void MainWindow::setTaskIsRunning(bool flag)
+{
+    taskIsRunning = flag;
+}
+
 void MainWindow::makeImageFromFilePath(const QString &path)
 {
     QImage image = Core::shared().imageFromTxtFile(path);
@@ -87,6 +93,7 @@ void MainWindow::makeImageFromFilePath(const QString &path)
 void MainWindow::on_loadTxtFiles_triggered()
 {
     QStringList files = QFileDialog::getOpenFileNames(this,"Открыть файл","","*.txt *.all");
+    qDebug() << files;
     ui->listWidget->addItems(files);
 }
 
@@ -207,7 +214,7 @@ void MainWindow::on_processPushButton_clicked()
         return;
     }
 
-    if (selectingTask and selectingTask->isRunning())
+    if (taskIsRunning)
     {
         qDebug () << "task is running";
         return;
@@ -230,11 +237,12 @@ void MainWindow::on_processPushButton_clicked()
     }
 
     dests.clear();
-    selectingTask = new SelectingProcessManager(paths,this);
+    selectingTask = new SelectingProcessManager(paths);
 
     connect(selectingTask,&SelectingProcessManager::destPair,&StaticModel::shared(),&StaticModel::addDestPair);
     connect(selectingTask,&SelectingProcessManager::setEnableDiagram,this,&MainWindow::enableDiagramButton);
     connect(selectingTask,&SelectingProcessManager::processPercent,this,&MainWindow::updateProcessPercentage);
+    connect(selectingTask,&SelectingProcessManager::isRunning,this,&MainWindow::setTaskIsRunning);
 
     pool->start(selectingTask);
 }
@@ -242,11 +250,10 @@ void MainWindow::on_processPushButton_clicked()
 
 void MainWindow::on_diagramPushButton_clicked()
 {
-//    DiagramWindow *diagram = new DiagramWindow(this);
-
-//    diagram->show();
-    auto pair = Core::shared().findAbsoluteMaxMinHeights();
-    qDebug() << "max = " << pair.first << " min = " << pair.second;
+    Grapher::shared().clearView();
+    Core::shared().calculateFrequencies(50);
+    DiagramWindow *diagram = new DiagramWindow(this);
+    diagram->show();
 }
 
 
