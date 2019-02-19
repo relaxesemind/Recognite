@@ -5,6 +5,7 @@
 #include <QPoint>
 #include <algorithm>
 #include <math.h>
+#include <QDebug>
 #include <limits>
 
 
@@ -27,14 +28,19 @@ struct HeightCoordinate
         return *this;
     }
 
-    bool operator==(const HeightCoordinate& rvalue)
+    bool operator<(const HeightCoordinate& rvalue) const
+    {
+        return height < rvalue.height;
+    }
+
+    bool operator==(const HeightCoordinate& rvalue) const
     {
         return x == rvalue.x and  y == rvalue.y and height == rvalue.height;
     }
 
-    bool operator!=(const HeightCoordinate& rvalue)
+    bool operator!=(const HeightCoordinate& rvalue) const
     {
-        return *this == rvalue;
+        return !(*this == rvalue);
     }
 
     int x, y;
@@ -44,7 +50,7 @@ struct HeightCoordinate
 struct Area
 {
     Area() = default;
-    explicit Area(qint32 number): id(number), points(0) {}
+    explicit Area(qint32 number): id(number), points(0), maxHeight(0.f) {}
 
     Area& operator=(const Area& obj)
     {
@@ -64,12 +70,14 @@ struct Area
     }
 
     HeightCoordinate getCenterPoint();
+    float getMaxHeight(bool force = true);
 
     qint32 id;
     QVector<HeightCoordinate> points;
 
 private:
     HeightCoordinate centerCoord;
+    float maxHeight;
 };
 
 

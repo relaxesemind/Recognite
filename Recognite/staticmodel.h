@@ -25,6 +25,7 @@ public:
     float absoluteMINheight;
     QVector<int> frequencies;
     QVector<std::pair<QString,QImage>> sources, dests;
+    QVector<InputModel> inputModels;
     QMap <
          QString,
          QVector<Area>

@@ -9,8 +9,8 @@
 
 struct InputModel
 {
-    InputModel() = default;
-    InputModel(int _id, const QString& _path, QVector<QVector<float>>&& _matrix): id(_id), path(_path), matrix(_matrix), min(0.f), max(0.f) {}
+    InputModel();
+    InputModel(int _id, const QString& _path, QVector<QVector<float>>&& _matrix);
 
     template<class lambda> void foreachHeight(lambda callableObject)
     {
@@ -19,6 +19,8 @@ struct InputModel
             std::for_each(matrix[i].begin(),matrix[i].end(),callableObject);
         }
     }
+
+    std::pair<float, float> getMaxMin(bool force = true);
 
     InputModel& operator=(const InputModel& rvalue)
     {

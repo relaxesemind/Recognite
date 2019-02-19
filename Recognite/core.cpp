@@ -16,28 +16,22 @@ QImage Core::imageFromTxtFile(const QString &path)
        return QImage();
    }
 
-   float max = std::numeric_limits<float>::min();
-   float min = std::numeric_limits<float>::max();
+   auto& inputModels = StaticModel::shared().inputModels;
+   auto pair = model.getMaxMin();
+
+   float max = pair.first;
+   float min = pair.second;
 
    int sizeY = model.sizeY();
    int sizeX = model.sizeX();
-
-   model.foreachHeight([&max,&min](float& value)
-   {
-       max = value > max ? value : max;
-       min = value < min ? value : min;
-   });
 
    model.foreachHeight([min](float& value)
    {
        value += std::abs(min);
    });
 
-   max += std::abs(min);
-   min += std::abs(min);
-
-   model.min = min;
-   model.max = max;
+   model.min += std::abs(min);
+   model.max += std::abs(min);
 
    QImage image(sizeX,sizeY,QImage::Format_RGB32);
 
@@ -50,31 +44,35 @@ QImage Core::imageFromTxtFile(const QString &path)
        }
    }
 
-   models.append(model);
+   inputModels.append(model);
    return image;
 }
 
-void Core::setRange(int min, int max)
+void Core::setRange(float min, float max)
 {
-    rangeMin = min;
-    rangeMax = max;
+    minFromUI = min;
+    maxFromUI = max;
 }
 
 std::pair<float, float> Core::findAbsoluteMaxMinHeights()
 {
-    auto& objects = StaticModel::shared().objectsMap;
-    float min = std::numeric_limits<float>::max();
-    float max = std::numeric_limits<float>::min();
+    auto& models = StaticModel::shared().inputModels;
 
-    std::for_each(objects.begin(),objects.end(),[&min, &max](QVector<Area>& singleImageObjects)
+    float max = std::numeric_limits<float>::min();
+    float min = std::numeric_limits<float>::max();
+
+    for (InputModel& model: models)
     {
-        std::for_each(singleImageObjects.begin(),singleImageObjects.end(),[&min,&max](Area& area)
-        {
-            float center = area.getCenterPoint().height;
-            max = center > max ? center : max;
-            min = center < min ? center : min;
-        });
-    });
+        auto pair = model.getMaxMin();
+        float localMax = pair.first;
+        float localMin = pair.second;
+
+        max = localMax > max ? localMax : max;
+        min = localMin < min ? localMin : min;
+    }
+
+    StaticModel::shared().absoluteMAXheight = max;
+    StaticModel::shared().absoluteMINheight = min;
 
     return std::make_pair(max,min);
 }
@@ -107,11 +105,11 @@ void Core::calculateFrequencies(int numOfColumn)
     {
         std::for_each(singleImageObjects.begin(),singleImageObjects.end(),[&](Area& object)
         {
-            float center = object.getCenterPoint().height;
+            float height = object.getMaxHeight();
 
             int column = 0;
 
-            while(center > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
+            while(height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
             {
                 ++column;
             }
@@ -140,10 +138,15 @@ QVector<QPointF> Core::calcPointsForGraph()
     return result;
 }
 
+void Core::setMinObjectSize(int value)
+{
+    minObjectSize = value;
+}
+
 inline bool Core::inRange(qint32 x, qint32 y, const InputModel& model)
 {
-    int comp = model.colorOfHeight(x,y);
-    return  (comp <= rangeMax) and (comp >= rangeMin);
+    float height = model.matrix[y][x];
+    return  height < maxFromUI and height > minFromUI;
 }
 
 void Core::fill(const InputModel &model, QVector<QVector<qint32>>& V, qint32 x, qint32 y, qint32 L)
@@ -193,6 +196,7 @@ QImage Core::binImageFromTxtFile(const QString &path)
     }
 
     int id = 0;
+    auto& models = StaticModel::shared().inputModels;
 
     for (int i = 0;i < models.count();++i)
     {
@@ -244,6 +248,15 @@ QImage Core::binImageFromTxtFile(const QString &path)
                  }
              }
         }
+
+    int min_objSize = minObjectSize;
+    int sizeBefore = objects.size();
+
+    objects.erase(
+    std::remove_if(objects.begin(),objects.end(),[min_objSize](Area& obj){return obj.points.count() <= min_objSize;}),objects.end()
+            );
+
+    qDebug() <<"size before = " << sizeBefore << " after = " << objects.size();
 
     StaticModel::shared().objectsMap.insert(model.path,std::move(objects));
 

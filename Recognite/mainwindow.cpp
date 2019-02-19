@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->menuBar->setNativeMenuBar(false);
     selectingTask = nullptr;
     taskIsRunning = false;
-
     QListWidget *listWidget = ui->listWidget;
     listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -104,7 +103,9 @@ void MainWindow::on_loadTxtFiles_triggered()
 
 void MainWindow::on_maxHeightSlider_valueChanged(int value)
 {
-    ui->maxHeightLineEdit->setText(QString::number(value));
+    float fValue = static_cast<float>(value) / 10.f;
+
+    ui->maxHeightLineEdit->setText(QString::number(fValue,'f',1));
 
     if (value < ui->minHeightSlider->value())
     {
@@ -114,7 +115,9 @@ void MainWindow::on_maxHeightSlider_valueChanged(int value)
 
 void MainWindow::on_minHeightSlider_valueChanged(int value)
 {
-    ui->minHeightLineEdit->setText(QString::number(value));
+    float fValue = static_cast<float>(value) / 10.f;
+
+    ui->minHeightLineEdit->setText(QString::number(fValue,'f',1));
 
     if (value > ui->maxHeightSlider->value())
     {
@@ -124,40 +127,41 @@ void MainWindow::on_minHeightSlider_valueChanged(int value)
 
 void MainWindow::on_maxHeightLineEdit_textChanged(const QString &arg1)
 {
-    bool ok;
-    int number = arg1.toInt(&ok,10);
-    if (!ok)
-    {
-        ui->maxHeightLineEdit->setText(QString::number(ui->maxHeightSlider->value()));
-    }
+//    bool ok;
+//    int number = arg1.toFloat(&ok);
+//    if (!ok)
+//    {
+//        float fValue = static_cast<float>(ui->maxHeightSlider->value()) / 10.f;
+//        ui->maxHeightLineEdit->setText(QString::number(fValue,'f',1));
+//    }
 
-    if (number > 255)
-    {
-        ui->maxHeightLineEdit->setText(QString::number(255));
-    }
-    if (number < 0)
-    {
-        ui->maxHeightLineEdit->setText(QString::number(0));
-    }
+//    if (number > 255)
+//    {
+//        ui->maxHeightLineEdit->setText(QString::number(255));
+//    }
+//    if (number < 0)
+//    {
+//        ui->maxHeightLineEdit->setText(QString::number(0));
+//    }
 }
 
 void MainWindow::on_minHeightLineEdit_textEdited(const QString &arg1)
 {
-    bool ok;
-    int number = arg1.toInt(&ok,10);
-    if (!ok)
-    {
-        ui->minHeightLineEdit->setText(QString::number(ui->minHeightSlider->value()));
-    }
+//    bool ok;
+//    int number = arg1.toInt(&ok,10);
+//    if (!ok)
+//    {
+//        ui->minHeightLineEdit->setText(QString::number(ui->minHeightSlider->value()));
+//    }
 
-    if (number > 255)
-    {
-        ui->minHeightLineEdit->setText(QString::number(255));
-    }
-    if (number < 0)
-    {
-        ui->minHeightLineEdit->setText(QString::number(0));
-    }
+//    if (number > 255)
+//    {
+//        ui->minHeightLineEdit->setText(QString::number(255));
+//    }
+//    if (number < 0)
+//    {
+//        ui->minHeightLineEdit->setText(QString::number(0));
+//    }
 }
 
 void MainWindow::on_pushButton_clicked()//build images
@@ -167,6 +171,24 @@ void MainWindow::on_pushButton_clicked()//build images
     {
         this->makeImageFromFilePath(listWidget->item(i)->text());
     }
+
+   auto pair = Core::shared().findAbsoluteMaxMinHeights();
+   float maxNumber = pair.first;
+   float minNumber = pair.second;
+   QString max = QString::number(pair.first);
+   QString min = QString::number(pair.second);
+   int interval = static_cast<int>((maxNumber - minNumber) / 30);
+
+
+   ui->label_4->setText(QString("Абсолютный MAX = ") + max + QString("нм"));
+   ui->label_5->setText(QString("Абсолютный MIN = ") + min + QString("нм"));
+   ui->maxHeightSlider->setSingleStep(interval);
+   ui->maxHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
+   ui->maxHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
+   ui->minHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
+   ui->minHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
+   ui->maxHeightSlider->setValue(static_cast<int>(maxNumber * 10));
+   ui->minHeightSlider->setValue(static_cast<int>((maxNumber - minNumber) / 3) * 10);
 }
 
 void MainWindow::updateTableWidget()
@@ -225,9 +247,11 @@ void MainWindow::on_processPushButton_clicked()
         return;
     }
 
-    int min = ui->minHeightLineEdit->text().toInt();
-    int max = ui->maxHeightLineEdit->text().toInt();
-    Core::shared().setRange(min,max);
+    int min = ui->minHeightSlider->value();
+    int max = ui->maxHeightSlider->value();
+    int minObjSize = ui->minObjSizeLineEdit->text().toInt();
+    Core::shared().setRange(static_cast<float>(min) / 10.f,static_cast<float>(max) / 10.f);
+    Core::shared().setMinObjectSize(minObjSize);
 
     QStringList paths;
 
@@ -264,11 +288,6 @@ void MainWindow::on_diagramPushButton_clicked()
 void MainWindow::showListMenuAtPos(QPoint pos)
 {
     QListWidget *listWidget = ui->listWidget;
-    if (listWidget->count() == 0)
-    {
-        return;
-    }
-
     QPoint globalPos = listWidget->mapToGlobal(pos);
     QMenu menu(this);
 
@@ -298,9 +317,3 @@ void MainWindow::showListMenuAtPos(QPoint pos)
     menu.addActions(QList<QAction *>{removeAction, addItemAction,removeAll});
     menu.exec(globalPos);
 }
-
-
-
-
-
-

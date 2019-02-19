@@ -30,11 +30,12 @@ class Core : public QObject
 public:
     QImage imageFromTxtFile(const QString& path);
     QImage binImageFromTxtFile(const QString& path);
-    void setRange(int min, int max);
+    void setRange(float min, float max);
+
     std::pair<float,float> findAbsoluteMaxMinHeights();
     void calculateFrequencies(int numOfColumn);
     QVector<QPointF> calcPointsForGraph();
-
+    void setMinObjectSize(int value);
 
 signals:
 
@@ -42,9 +43,9 @@ public slots:
 
 private:
     Parser parser;
-    QVector<InputModel> models;
-    int rangeMax;
-    int rangeMin;
+    float maxFromUI;
+    float minFromUI;
+    int minObjectSize;
     bool inRange(qint32 x, qint32 y, const InputModel& model);
     void fill(const InputModel& model, QVector<QVector<qint32>>& V, qint32 x, qint32 y, qint32 L);
     void formObjects();

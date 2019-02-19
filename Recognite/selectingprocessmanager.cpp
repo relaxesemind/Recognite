@@ -22,12 +22,6 @@ void SelectingProcessManager::run()
        emit processPercent((1 + i) * 100 / paths.count());
     }
 
-    auto heights = Core::shared().findAbsoluteMaxMinHeights();
-
-    StaticModel::shared().absoluteMAXheight = heights.first;
-    StaticModel::shared().absoluteMINheight = heights.second;
-
     emit setEnableDiagram(!StaticModel::shared().objectsMap.isEmpty());
-
     emit isRunning(false);
 }

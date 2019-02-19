@@ -48,3 +48,19 @@ HeightCoordinate Area::getCenterPoint()
 
     return centerCoord;
 }
+
+float Area::getMaxHeight(bool force)
+{
+    if (points.isEmpty())
+    {
+        return 0.f;
+    }
+
+    if (maxHeight == 0.f or force)
+    {
+        maxHeight = (*std::max_element(points.begin(),points.end())).height;
+        qDebug() << "max local = " << maxHeight;
+    }
+
+    return maxHeight;
+}
