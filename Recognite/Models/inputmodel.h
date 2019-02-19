@@ -12,11 +12,11 @@ struct InputModel
     InputModel() = default;
     InputModel(int _id, const QString& _path, QVector<QVector<float>>&& _matrix): id(_id), path(_path), matrix(_matrix), min(0.f), max(0.f) {}
 
-    template<class lambda> void foreachHeight(lambda call)
+    template<class lambda> void foreachHeight(lambda callableObject)
     {
         for (int i = 0; i < matrix.size(); ++i)
         {
-            std::for_each(matrix[i].begin(),matrix[i].end(),call);
+            std::for_each(matrix[i].begin(),matrix[i].end(),callableObject);
         }
     }
 

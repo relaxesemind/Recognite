@@ -17,6 +17,12 @@
 #include <QPixmap>
 #include <QStringList>
 #include <QThreadPool>
+#include <QListWidgetItem>
+#include <QMouseEvent>
+#include <QMenu>
+#include <QAction>
+#include <QCursor>
+#include <QDesktopWidget>
 
 
 
@@ -56,6 +62,8 @@ private slots:
     void on_processPushButton_clicked();
 
     void on_diagramPushButton_clicked();
+
+    void showListMenuAtPos(QPoint pos);
 
 private:
     void updateTableWidget();

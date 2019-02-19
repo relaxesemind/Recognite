@@ -12,22 +12,27 @@ MainWindow::MainWindow(QWidget *parent) :
     selectingTask = nullptr;
     taskIsRunning = false;
 
-    ui->listWidget->addItems(QStringList
+    QListWidget *listWidget = ui->listWidget;
+    listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
+
+    listWidget->addItems(QStringList
     {
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
-     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
+        "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
    });
 }
 
@@ -254,6 +259,44 @@ void MainWindow::on_diagramPushButton_clicked()
     Core::shared().calculateFrequencies(50);
     DiagramWindow *diagram = new DiagramWindow(this);
     diagram->show();
+}
+
+void MainWindow::showListMenuAtPos(QPoint pos)
+{
+    QListWidget *listWidget = ui->listWidget;
+    if (listWidget->count() == 0)
+    {
+        return;
+    }
+
+    QPoint globalPos = listWidget->mapToGlobal(pos);
+    QMenu menu(this);
+
+    QAction *addItemAction = new QAction(QString("Добавить файлы"),this);
+
+    connect(addItemAction,&QAction::triggered,this,[&listWidget]
+    {
+        QStringList files = QFileDialog::getOpenFileNames(nullptr,"Открыть файл","","*.txt *.all");
+        listWidget->addItems(files);
+    });
+
+    QAction *removeAction = new QAction(QString("Удалить файл"),this);
+    removeAction->setShortcut(QKeySequence::Delete);
+
+    connect(removeAction,&QAction::triggered,this,[&listWidget]
+    {
+        for (int i = 0; i < listWidget->selectedItems().size(); ++i)
+        {
+            QListWidgetItem *item = listWidget->takeItem(listWidget->currentRow());
+            delete item;
+        }
+    });
+
+    QAction *removeAll = new QAction(QString("Удалить все"),this);
+    connect(removeAll, &QAction::triggered, this, [&listWidget]{listWidget->clear();});
+///
+    menu.addActions(QList<QAction *>{removeAction, addItemAction,removeAll});
+    menu.exec(globalPos);
 }
 
 
