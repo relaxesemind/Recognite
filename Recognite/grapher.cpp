@@ -2,24 +2,23 @@
 
 Grapher::Grapher()
 {
-    view = new QChartView();
+    view = new ChartView();
     chart = new QChart();
 
     view->setChart(chart);
     view->setRenderHint(QPainter::Antialiasing);
     view->setRubberBand(QChartView::RectangleRubberBand);
+
+//    rubberBand = view->findChild<QRubberBand *>();
+//    if (rubberBand)
+//    {
+//        rubberBand->installEventFilter(this);
+//        connect(this,&Grapher::rubberBandChanged,this,&Grapher::rubberZoomAdapt);
+//    }
 }
 
-//Grapher::~Grapher()
-//{
-//   delete view;
-//   delete chart;
-//}
-
-void Grapher::addPointsAtGraph(const QVector<QPointF>& points)
+void Grapher::addPointsAtGraph(const QVector<QPointF>& points, GrapherMode::Options mode)
 {
-    QSplineSeries *series = new QSplineSeries();
-
     chart->legend()->hide();
     QFont font;
     font.setPixelSize(18);
@@ -30,40 +29,88 @@ void Grapher::addPointsAtGraph(const QVector<QPointF>& points)
     QValueAxis *axisX = new QValueAxis();
     QValueAxis *axisY = new QValueAxis();
 
-    axisY->setMax(100);
-    axisY->setMin(0);
+    axisY->setMax(maxY);
+    axisY->setMin(minY);
 
-    axisX->setMin(0);
-    axisX->setMax(points.size() - 1);
+    axisX->setMin(minX);
+    axisX->setMax(maxX);
 
-    axisY->setMinorTickCount(5);
+    axisX->setLabelFormat("%.1f nm");
+    axisY->setLabelFormat("%.1f");
 
-    axisX->setLabelFormat("%i");
-    axisY->setLabelFormat("%i%%");
+    axisX->setTickCount(8);
+    axisY->setTickCount(8);
 
     chart->setAxisX(axisX);
     chart->setAxisY(axisY);
 
-    for (QPointF p : points)
+    if (mode & GrapherMode::BarVisible)
     {
-        series->append(p);
+        QBarSeries *series = new QBarSeries();
+        QBarSet *barSet = new QBarSet("",nullptr);
+
+        for (QPointF p : points)
+        {
+            barSet->append(p.y());
+        }
+
+        barSet->setColor(QColor("orange"));
+        series->insert(0,barSet);
+        chart->addSeries(series);
     }
 
-//    series->setMarkerShape(QSplineSeries::SeriesTypeLine);
-//    series->setMarkerSize(10.0);
-    QColor color;
-    color.setNamedColor("red");
-    QPen pen(color);
-    pen.setWidthF(2.5);
-    series->setPen(pen);
+    if (mode & GrapherMode::SplineVisible)
+    {
+        QSplineSeries *seriesLine = new QSplineSeries();
+        for (QPointF p : points)
+        {
+            seriesLine->append(p);
+        }
 
-    chart->addSeries(series);
+        QColor color;
+        color.setNamedColor("red");
+        QPen pen(color);
+        pen.setWidthF(2.5);
 
-
+        seriesLine->setPen(pen);
+        chart->addSeries(seriesLine);
+    }
 }
 
 void Grapher::clearView()
 {
     chart->removeAllSeries();
-
 }
+
+void Grapher::setXRange(float min, float max)
+{
+    minX = min;
+    maxX = max;
+}
+
+void Grapher::setYRange(float min, float max)
+{
+    minY = min;
+    maxY = max;
+}
+
+bool Grapher::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == rubberBand && event->type() == QEvent::Resize)
+    {
+            QPointF fp = chart->mapToValue(rubberBand->geometry().topLeft());
+            QPointF tp = chart->mapToValue(rubberBand->geometry().bottomRight());
+            emit rubberBandChanged(fp, tp);
+    }
+
+    return QObject::eventFilter(watched, event);
+}
+
+void Grapher::rubberZoomAdapt(QPointF fp, QPointF tp)
+{
+  // qDebug() << "zoom" << fp << " " << tp;
+}
+
+
+
+

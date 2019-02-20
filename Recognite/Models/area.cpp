@@ -59,7 +59,6 @@ float Area::getMaxHeight(bool force)
     if (maxHeight == 0.f or force)
     {
         maxHeight = (*std::max_element(points.begin(),points.end())).height;
-        qDebug() << "max local = " << maxHeight;
     }
 
     return maxHeight;

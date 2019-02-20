@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     listWidget->addItems(QStringList
     {
-        "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
+         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
          "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
          "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
          "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
@@ -46,7 +46,6 @@ void MainWindow::updateProcessPercentage(int value)
     QProgressBar *bar = ui->progressBar;
     auto& dests = StaticModel::shared().dests;
 
-    bar->setTextVisible(true);
     if (value == 100)
     {
         bar->setValue(0);
@@ -87,7 +86,7 @@ void MainWindow::makeImageFromFilePath(const QString &path)
 
     if (std::find(sources.begin(),sources.end(), pair) == sources.end())
     {
-        sources.append(pair);
+        sources.append(std::make_pair(path,image));
     }
 
     ui->imageView->setImage(QPixmap::fromImage(image));
@@ -198,13 +197,14 @@ void MainWindow::updateTableWidget()
 
     table->setColumnCount(sources.count());
     table->setRowCount(1);
+    const int imgSize = Consts::previewSourceImageHeight;
 
     for (int i = 0; i < sources.count(); ++i)
     {
         QTableWidgetItem *item = new QTableWidgetItem;
-        table->setRowHeight(i,115);
-        table->setColumnWidth(i,115);
-        item->setData(Qt::DecorationRole,QPixmap::fromImage(sources.at(i).second).scaled(110,110,Qt::KeepAspectRatio));
+        table->setRowHeight(i,imgSize + 5);
+        table->setColumnWidth(i,imgSize + 5);
+        item->setData(Qt::DecorationRole,QPixmap::fromImage(sources.at(i).second).scaled(imgSize,imgSize,Qt::KeepAspectRatio));
         table->setItem(0,i,item);
     }
 }
@@ -293,9 +293,9 @@ void MainWindow::showListMenuAtPos(QPoint pos)
 
     QAction *addItemAction = new QAction(QString("Добавить файлы"),this);
 
-    connect(addItemAction,&QAction::triggered,this,[&listWidget]
+    connect(addItemAction,&QAction::triggered,this,[&listWidget,this]
     {
-        QStringList files = QFileDialog::getOpenFileNames(nullptr,"Открыть файл","","*.txt *.all");
+        QStringList files = QFileDialog::getOpenFileNames(this,"Открыть файл","","*.txt *.all");
         listWidget->addItems(files);
     });
 

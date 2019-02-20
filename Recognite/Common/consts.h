@@ -9,6 +9,7 @@ namespace Consts
    const qreal zoomMultiple = 1.05;
    const QRgb whiteRgb = qRgb(255,255,255);
    const QRgb blackRgb = qRgb(0,0,0);
+   const int previewSourceImageHeight = 110;
 
 }
 

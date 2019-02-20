@@ -1,5 +1,9 @@
 #include "core.h"
 
+inline QRgb grayScalePixel(int value)
+{
+    return qRgb(value,value,value);
+}
 
 QImage Core::imageFromTxtFile(const QString &path)
 {
@@ -39,8 +43,7 @@ QImage Core::imageFromTxtFile(const QString &path)
    {
        for (int j = 0; j < sizeX; ++j)
        {
-            int comp = model.colorOfHeight(j,i);
-            image.setPixel(i,j,qRgb(comp,comp,comp));
+            image.setPixel(i,j,grayScalePixel(model.colorOfHeight(j,i)));
        }
    }
 
@@ -101,25 +104,21 @@ void Core::calculateFrequencies(int numOfColumn)
     frequencies.clear();
     frequencies.resize(numOfColumn);
 
-    std::for_each(objects.begin(),objects.end(),[&](QVector<Area>& singleImageObjects)
+    StaticModel::shared().foreachArea([&frequencies, min, max, singleInterval](Area& object)
     {
-        std::for_each(singleImageObjects.begin(),singleImageObjects.end(),[&](Area& object)
+        float height = object.getMaxHeight();
+        int column = 0;
+
+        while(height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
         {
-            float height = object.getMaxHeight();
+            ++column;
+        }
+        if (column < frequencies.size() - 1)
+        {
 
-            int column = 0;
+           ++frequencies[column];
+        }
 
-            while(height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
-            {
-                ++column;
-            }
-            if (column < frequencies.size() - 1)
-            {
-
-               ++frequencies[column];
-            }
-
-        });
     });
 
     qDebug() << "end calculateFrequencies";
@@ -134,7 +133,7 @@ QVector<QPointF> Core::calcPointsForGraph()
     {
         result[i] = QPointF(i,frequencies[i]);
     }
-
+    qDebug() << "frequencies " << frequencies;
     return result;
 }
 
@@ -146,7 +145,7 @@ void Core::setMinObjectSize(int value)
 inline bool Core::inRange(qint32 x, qint32 y, const InputModel& model)
 {
     float height = model.matrix[y][x];
-    return  height < maxFromUI and height > minFromUI;
+    return  height <= maxFromUI and height >= minFromUI;
 }
 
 void Core::fill(const InputModel &model, QVector<QVector<qint32>>& V, qint32 x, qint32 y, qint32 L)
@@ -198,7 +197,7 @@ QImage Core::binImageFromTxtFile(const QString &path)
     int id = 0;
     auto& models = StaticModel::shared().inputModels;
 
-    for (int i = 0;i < models.count();++i)
+    for (int i = 0;i < models.count(); ++i)
     {
         if (models[i].path == path)
         {
@@ -253,8 +252,18 @@ QImage Core::binImageFromTxtFile(const QString &path)
     int sizeBefore = objects.size();
 
     objects.erase(
-    std::remove_if(objects.begin(),objects.end(),[min_objSize](Area& obj){return obj.points.count() <= min_objSize;}),objects.end()
+    std::remove_if(objects.begin(),objects.end(),[min_objSize](Area& obj){return obj.points.count() < min_objSize;}),
+                   objects.end()
             );
+
+    QVector<QVector<bool>> updatedLabels(_h,QVector<bool>(_w,false));
+
+    std::for_each(objects.begin(),objects.end(),[&updatedLabels](Area& area){
+        std::for_each(area.points.begin(),area.points.end(),[&updatedLabels](HeightCoordinate& coord){
+            updatedLabels[coord.y][coord.x] = true;
+        });
+    });
+
 
     qDebug() <<"size before = " << sizeBefore << " after = " << objects.size();
 
@@ -268,14 +277,7 @@ QImage Core::binImageFromTxtFile(const QString &path)
     {
         for (int j = 0; j < _w; ++j)
         {
-             if (labels[i][j])
-             {
-                image.setPixel(i,j,Consts::whiteRgb);
-             }
-             else
-             {
-                 image.setPixel(i,j,Consts::blackRgb);
-             }
+            image.setPixel(i,j,updatedLabels[i][j] ? Consts::whiteRgb : Consts::blackRgb);
         }
     }
 

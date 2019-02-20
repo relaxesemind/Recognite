@@ -5,8 +5,6 @@ SelectingProcessManager::SelectingProcessManager(const QStringList &paths) : pat
 
 }
 
-
-
 void SelectingProcessManager::run()
 {
     emit isRunning(true);

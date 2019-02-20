@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMessageBox>
 #include <memory>
+#include <QString>
 
 #define quo QString("'")
 
