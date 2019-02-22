@@ -47,7 +47,8 @@ SOURCES += \
     Models/inputmodel.cpp \
     imageview.cpp \
     selectingprocessmanager.cpp \
-    staticmodel.cpp
+    staticmodel.cpp \
+    gradientaxis.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -62,7 +63,8 @@ HEADERS += \
     Models/models.h \
     selectingprocessmanager.h \
     Common/consts.h \
-    staticmodel.h
+    staticmodel.h \
+    gradientaxis.h
 
 FORMS += \
         mainwindow.ui \

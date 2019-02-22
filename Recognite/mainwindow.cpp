@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     taskIsRunning = false;
     QListWidget *listWidget = ui->listWidget;
     listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->imageView->addGradientAxis(0,0);
 
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
 
@@ -187,7 +188,7 @@ void MainWindow::on_pushButton_clicked()//build images
    ui->minHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
    ui->minHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
    ui->maxHeightSlider->setValue(static_cast<int>(maxNumber * 10));
-   ui->minHeightSlider->setValue(static_cast<int>((maxNumber - minNumber) / 3) * 10);
+   ui->minHeightSlider->setValue(static_cast<int>((maxNumber - minNumber) / 4) * 10);
 }
 
 void MainWindow::updateTableWidget()
