@@ -3,6 +3,12 @@
 
 
 #include <QWidget>
+#include <QHBoxLayout>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QStyleOption>
+#include <QLabel>
+#include <QVBoxLayout>
 
 
 class GradientAxis : public QWidget
@@ -10,6 +16,9 @@ class GradientAxis : public QWidget
     Q_OBJECT
 public:
     explicit GradientAxis(QWidget *parent = nullptr);
+
+protected:
+    void paintEvent(QPaintEvent *event);
 
 signals:
 

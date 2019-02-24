@@ -13,7 +13,13 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QSlider>
 
+enum class ImageViewMode : int
+{
+     sourceAndDestsView = 0,
+     transparentOver = 1
+};
 
 class ImageView : public QGraphicsView
 {
@@ -24,6 +30,8 @@ class ImageView : public QGraphicsView
 public:
     explicit ImageView(QWidget* widget = nullptr);
 
+    ImageViewMode getCurrentMode() const;
+
 protected:
     void wheelEvent(QWheelEvent *event)override;
 
@@ -31,15 +39,24 @@ signals:
 
 public slots:
     void setImage(const QPixmap& pixmap);
+    void setBinaryImage(const QPixmap& pixmap);
     void addGradientAxis(float min, float max);
+    void setMode(ImageViewMode mode);
 
 private:
+    void setupSlider();
+
     QGraphicsScene scene;
     qreal currentScale;
     pItem currentImageItem;
+    pItem currentBinaryItem;
+    QSlider *opacitySlider;
+
     QGraphicsProxyWidget *proxyAxis;
     QHBoxLayout *layout;
+    GradientAxis *axis;
 
+    ImageViewMode currentMode;
     bool isAxisVisible;
     float minValue, maxValue;
 };

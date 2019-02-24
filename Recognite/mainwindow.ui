@@ -459,7 +459,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>3</string>
+                <string>1</string>
                </property>
               </widget>
              </item>
@@ -558,7 +558,7 @@
      <x>0</x>
      <y>0</y>
      <width>1151</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -566,7 +566,9 @@
      <string>Меню</string>
     </property>
     <addaction name="loadTxtFiles"/>
+    <addaction name="separator"/>
     <addaction name="action"/>
+    <addaction name="changeShowMode"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -587,6 +589,11 @@
   <action name="action">
    <property name="text">
     <string>Сбросить маштаб</string>
+   </property>
+  </action>
+  <action name="changeShowMode">
+   <property name="text">
+    <string>Переключить режим отображения</string>
    </property>
   </action>
  </widget>

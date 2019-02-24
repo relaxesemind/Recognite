@@ -11,29 +11,32 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->menuBar->setNativeMenuBar(false);
     selectingTask = nullptr;
     taskIsRunning = false;
+    modeFlag = false;
+    currentImageId = -1;
+
     QListWidget *listWidget = ui->listWidget;
     listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->imageView->addGradientAxis(0,0);
 
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
 
-    listWidget->addItems(QStringList
-    {
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
-         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
-   });
+//    listWidget->addItems(QStringList
+//    {
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
+//         "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
+//   });
 }
 
 MainWindow::~MainWindow()
@@ -89,9 +92,6 @@ void MainWindow::makeImageFromFilePath(const QString &path)
     {
         sources.append(std::make_pair(path,image));
     }
-
-    ui->imageView->setImage(QPixmap::fromImage(image));
-    this->updateTableWidget();
 }
 
 void MainWindow::on_loadTxtFiles_triggered()
@@ -165,12 +165,24 @@ void MainWindow::on_minHeightLineEdit_textEdited(const QString &arg1)
 }
 
 void MainWindow::on_pushButton_clicked()//build images
-{
+{   
     QListWidget *listWidget = ui->listWidget;
+    auto& dests = StaticModel::shared().dests;
+    auto& sources = StaticModel::shared().sources;
+
     for (int i = 0; i < listWidget->count(); ++i)
     {
         this->makeImageFromFilePath(listWidget->item(i)->text());
     }
+
+    if (!sources.isEmpty())
+    {
+        ui->imageView->setImage(QPixmap::fromImage(sources.at(0).second));
+        currentImageId = 0;
+    }
+
+
+   this->updateTableWidget();
 
    auto pair = Core::shared().findAbsoluteMaxMinHeights();
    float maxNumber = pair.first;
@@ -215,20 +227,33 @@ void MainWindow::on_tableWidget_clicked(const QModelIndex &index)
     int id = index.column();
     auto& sources = StaticModel::shared().sources;
     auto& dests = StaticModel::shared().dests;
+    ImageViewMode mode = ui->imageView->getCurrentMode();
 
     if (id < 0 or id > sources.count() - 1)
     {
         return;
     }
 
-    ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
 
-    if (id > dests.count() - 1)
+    if (mode == ImageViewMode::sourceAndDestsView)
     {
-        return;
+        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
+        if (id > dests.count() - 1)
+        {
+            return;
+        }
+        ui->imageViewSelected->setImage(QPixmap::fromImage(dests.at(id).second));
     }
 
-    ui->imageViewSelected->setImage(QPixmap::fromImage(dests.at(id).second));
+    if (mode == ImageViewMode::transparentOver)
+    {
+        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
+        if (id > dests.count() - 1)
+        {
+            return;
+        }
+        ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(id).second));
+    }
 }
 
 void MainWindow::on_processPushButton_clicked()
@@ -289,6 +314,10 @@ void MainWindow::on_diagramPushButton_clicked()
 void MainWindow::showListMenuAtPos(QPoint pos)
 {
     QListWidget *listWidget = ui->listWidget;
+    QTableWidget *tableWidget = ui->tableWidget;
+    ImageView *imageView = ui->imageView;
+    ImageView *destView = ui->imageViewSelected;
+
     QPoint globalPos = listWidget->mapToGlobal(pos);
     QMenu menu(this);
 
@@ -313,8 +342,54 @@ void MainWindow::showListMenuAtPos(QPoint pos)
     });
 
     QAction *removeAll = new QAction(QString("Удалить все"),this);
-    connect(removeAll, &QAction::triggered, this, [&listWidget]{listWidget->clear();});
+    connect(removeAll, &QAction::triggered, this, [&listWidget, &tableWidget, &imageView, &destView]{
+        listWidget->clear();
+        tableWidget->clear();
+        tableWidget->setColumnCount(0);
+        imageView->setImage(QPixmap());
+        destView->setImage(QPixmap());
+        StaticModel::shared().sources.clear();
+        StaticModel::shared().dests.clear();
+
+    });
 ///
     menu.addActions(QList<QAction *>{removeAction, addItemAction,removeAll});
     menu.exec(globalPos);
 }
+
+void MainWindow::on_changeShowMode_triggered()
+{
+    modeFlag = !modeFlag;
+    ImageViewMode mode;
+
+//    if (mode == ImageViewMode::sourceAndDestsView)
+//    {
+//        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
+//        ui->imageViewSelected->setImage(QPixmap::fromImage(dests.at(id).second));
+//    }
+
+//    if (mode == ImageViewMode::transparentOver)
+//    {
+//        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
+//        ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(id).second));
+//    }
+
+    if (modeFlag == true)
+    {
+        mode = ImageViewMode::transparentOver;
+//        ui->imageView->setBinaryImage(QPixmap::)
+    }
+    else
+    {
+        mode = ImageViewMode::sourceAndDestsView;
+    }
+
+    ui->imageViewSelected->setHidden(modeFlag);
+    ui->widget_2->setHidden(modeFlag);
+    ui->widget->setHidden(modeFlag);
+    ui->imageView->setMode(mode);
+}
+
+
+
+

@@ -65,6 +65,8 @@ private slots:
 
     void showListMenuAtPos(QPoint pos);
 
+    void on_changeShowMode_triggered();
+
 private:
     void updateTableWidget();
     void makeImageFromFilePath(const QString& path);
@@ -73,7 +75,9 @@ private:
     Ui::MainWindow *ui;
     QThreadPool *pool;
     SelectingProcessManager *selectingTask;
+    int currentImageId;
     bool taskIsRunning;
+    bool modeFlag;
 };
 
 #endif // MAINWINDOW_H
