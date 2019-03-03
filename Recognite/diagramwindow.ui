@@ -42,20 +42,32 @@
           <rect>
            <x>30</x>
            <y>20</y>
-           <width>571</width>
+           <width>647</width>
            <height>26</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QLabel" name="label">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Количество столбцов: </string>
+             <string>Размер кармана</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLineEdit" name="lineEdit">
+            <property name="minimumSize">
+             <size>
+              <width>55</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>45</width>
@@ -63,7 +75,10 @@
              </size>
             </property>
             <property name="text">
-             <string>50</string>
+             <string/>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -85,6 +100,12 @@
           </item>
           <item>
            <widget class="QSlider" name="horizontalSlider">
+            <property name="minimumSize">
+             <size>
+              <width>300</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>200</width>
@@ -148,7 +169,7 @@
      <x>0</x>
      <y>0</y>
      <width>900</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

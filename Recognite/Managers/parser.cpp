@@ -21,7 +21,10 @@ InputModel Parser::inputModelFromFile(const QString &path, int id)
         return InputModel();
     }
 
-    QStringList linesInFile = alltext.split('#');
+    QChar lineSeparator = StaticModel::shared().lineSeparator;
+    QChar numberSeparator = StaticModel::shared().numberSeparator;
+
+    QStringList linesInFile = alltext.split(lineSeparator);
 
     if (linesInFile.isEmpty())
     {
@@ -32,7 +35,7 @@ InputModel Parser::inputModelFromFile(const QString &path, int id)
 
     repeat(i,linesInFile.count())
     {
-        QStringList numbers = linesInFile.at(i).split(';');
+        QStringList numbers = linesInFile.at(i).split(numberSeparator);
 
         if (numbers.count() > linesInFile.count())
         {

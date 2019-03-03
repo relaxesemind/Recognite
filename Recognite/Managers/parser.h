@@ -5,8 +5,11 @@
 #include <QVector>
 #include <QFile>
 #include <QTextStream>
+
 #include "Common/magic.h"
 #include "Models/inputmodel.h"
+#include "staticmodel.h"
+
 
 class Parser : public QObject
 {

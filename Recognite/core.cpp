@@ -23,19 +23,19 @@ QImage Core::imageFromTxtFile(const QString &path)
    auto& inputModels = StaticModel::shared().inputModels;
    auto pair = model.getMaxMin();
 
-   float max = pair.first;
-   float min = pair.second;
+//   float max = pair.first;
+//   float min = pair.second;
 
    int sizeY = model.sizeY();
    int sizeX = model.sizeX();
 
-   model.foreachHeight([min](float& value)
-   {
-       value += std::abs(min);
-   });
+//   model.foreachHeight([min](float& value)
+//   {
+//       value += std::abs(min);
+//   });
 
-   model.min += std::abs(min);
-   model.max += std::abs(min);
+//   model.min += std::abs(min);
+//   model.max += std::abs(min);
 
    QImage image(sizeX,sizeY,QImage::Format_RGB32);
 
@@ -95,7 +95,7 @@ void Core::calculateFrequencies(int numOfColumn)
     float min = StaticModel::shared().absoluteMINheight;
 
 
-    float singleInterval = (max - min) / numOfColumn;
+    float singleInterval = std::abs(max - min) / numOfColumn;
 
     qDebug() << "max = " << max << " min = " << min;
     qDebug() << "singleInterval = " << singleInterval;
@@ -113,6 +113,7 @@ void Core::calculateFrequencies(int numOfColumn)
         {
             ++column;
         }
+
         if (column < frequencies.size() - 1)
         {
 
@@ -122,6 +123,19 @@ void Core::calculateFrequencies(int numOfColumn)
     });
 
     qDebug() << "end calculateFrequencies";
+}
+
+void Core::calculateFrequenciesWithInterval(float interval)
+{
+    if (interval < 0.0001f)
+    {
+        return;
+    }
+
+    float max = StaticModel::shared().absoluteMAXheight;
+    float min = StaticModel::shared().absoluteMINheight;
+    int columns = static_cast<int>((max - min) / interval);
+    this->calculateFrequencies(columns);
 }
 
 QVector<QPointF> Core::calcPointsForGraph()

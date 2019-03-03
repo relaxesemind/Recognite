@@ -20,6 +20,8 @@ TEMPLATE = app
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
+RC_ICONS = icon1.ico
+
 #INCLUDEPATH += open_cv/include
 
 #LIBS += $${_PRO_FILE_PWD_}/open_cv/bin/libopencv_calib3d320.dll
@@ -48,7 +50,8 @@ SOURCES += \
     imageview.cpp \
     selectingprocessmanager.cpp \
     staticmodel.cpp \
-    gradientaxis.cpp
+    gradientaxis.cpp \
+    parsersettingsdialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -64,11 +67,13 @@ HEADERS += \
     selectingprocessmanager.h \
     Common/consts.h \
     staticmodel.h \
-    gradientaxis.h
+    gradientaxis.h \
+    parsersettingsdialog.h
 
 FORMS += \
         mainwindow.ui \
-    diagramwindow.ui
+    diagramwindow.ui \
+    parsersettingsdialog.ui
 
 RESOURCES += \
     resources/resources.qrc

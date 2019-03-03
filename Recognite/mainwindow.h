@@ -7,6 +7,7 @@
 #include "core.h"
 #include "selectingprocessmanager.h"
 #include "staticmodel.h"
+#include "parsersettingsdialog.h"
 
 
 #include <QMainWindow>
@@ -67,9 +68,12 @@ private slots:
 
     void on_changeShowMode_triggered();
 
+    void on_actionInputFormatEdit_triggered();
+
 private:
     void updateTableWidget();
     void makeImageFromFilePath(const QString& path);
+    void setupListWidget();
 
 private:
     Ui::MainWindow *ui;

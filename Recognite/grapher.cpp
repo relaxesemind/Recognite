@@ -24,19 +24,19 @@ void Grapher::addPointsAtGraph(const QVector<QPointF>& points, GrapherMode::Opti
     font.setPixelSize(18);
     chart->setTitleFont(font);
     chart->setTitleBrush(QBrush(Qt::black));
-    chart->setTitle("Диаграмма высот в процентах от максимальной высоты");
+    chart->setTitle("Распределение по высотам");
 
     QValueAxis *axisX = new QValueAxis();
     QValueAxis *axisY = new QValueAxis();
 
-    axisY->setMax(maxY);
-    axisY->setMin(minY);
+    axisY->setMax(maxY * 100);
+    axisY->setMin(minY * 100);
 
     axisX->setMin(minX);
     axisX->setMax(maxX);
 
     axisX->setLabelFormat("%.1f nm");
-    axisY->setLabelFormat("%.1f");
+    axisY->setLabelFormat("%.1f%%");
 
     axisX->setTickCount(8);
     axisY->setTickCount(8);

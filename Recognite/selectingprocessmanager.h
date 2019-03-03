@@ -25,7 +25,7 @@ protected:
 signals:
     void processPercent(int);
     void setEnableDiagram(bool);
-    void destPair(const QString&,const QImage&);
+    void destPair(const QString&, const QImage&);
     void isRunning(bool);
 
 public slots:

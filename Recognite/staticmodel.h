@@ -11,6 +11,7 @@
 #include <QImage>
 #include <algorithm>
 #include <QString>
+#include <QChar>
 
 
 class StaticModel : public QObject
@@ -28,6 +29,7 @@ public:
 
         }
         std::pair<int,int> getMaxMinFrequencies() const;
+        int getAccumulateFreq(bool force = true);
 
 public slots:
         void addDestPair(const QString &path, const QImage &image);
@@ -37,11 +39,15 @@ public:
     float absoluteMINheight;
     QVector<int> frequencies;
     QVector<std::pair<QString,QImage>> sources, dests;
+    QChar numberSeparator, lineSeparator;
     QVector<InputModel> inputModels;
     QMap <
          QString,
          QVector<Area>
          > objectsMap;
+
+private:
+    int sumFreq;
 };
 
 #endif // STATICMODEL_H

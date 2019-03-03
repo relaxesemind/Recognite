@@ -51,10 +51,7 @@ struct InputModel
         return !path.isEmpty() and !matrix.isEmpty();
     }
 
-    int colorOfHeight(int x, int y) const
-    {
-        return static_cast<int>(matrix[y][x] * 255.f / std::abs(max - min));
-    }
+    int colorOfHeight(int x, int y) const;
 
 //properties
     int id;

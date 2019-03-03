@@ -8,7 +8,7 @@ InputModel::InputModel(): id(0), path(QString()), matrix(0), min(std::numeric_li
 InputModel::InputModel(int _id, const QString &_path, QVector<QVector<float> > &&_matrix): id(_id), path(_path), matrix(_matrix),
     min(std::numeric_limits<float>::max()), max(std::numeric_limits<float>::min())
 {
-
+    this->getMaxMin();
 }
 
 std::pair<float, float> InputModel::getMaxMin(bool force)
@@ -31,4 +31,14 @@ std::pair<float, float> InputModel::getMaxMin(bool force)
     }
 
     return std::make_pair(max,min);
+}
+
+int InputModel::colorOfHeight(int x, int y) const
+{
+    float reducedMax = max + std::abs(min);
+    float reducedMin = min + std::abs(min);
+    float value = matrix[y][x] + std::abs(min);
+    float h = std::abs(reducedMax - reducedMin);
+
+    return h < 0.0001f ? 0 : static_cast<int>(value * 255.f / h);
 }

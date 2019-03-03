@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1151</width>
-    <height>670</height>
+    <width>1033</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -557,7 +557,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1151</width>
+     <width>1033</width>
      <height>21</height>
     </rect>
    </property>
@@ -570,7 +570,14 @@
     <addaction name="action"/>
     <addaction name="changeShowMode"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Настройки</string>
+    </property>
+    <addaction name="actionInputFormatEdit"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -594,6 +601,11 @@
   <action name="changeShowMode">
    <property name="text">
     <string>Переключить режим отображения</string>
+   </property>
+  </action>
+  <action name="actionInputFormatEdit">
+   <property name="text">
+    <string>Изменить формат входных данных</string>
    </property>
   </action>
  </widget>

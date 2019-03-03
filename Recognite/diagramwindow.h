@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QInputDialog>
+#include <QFileDialog>
 #include <QStandardPaths>
 #include <QTextCodec>
 #include "grapher.h"
