@@ -7,6 +7,7 @@ ImageView::ImageView(QWidget* widget) : QGraphicsView(widget)
     currentMode = ImageViewMode::sourceAndDestsView;
     currentScale = 1.0;
     layout = nullptr;
+    this->setMouseTracking(true);
     setupSlider();
 }
 
@@ -34,6 +35,14 @@ void ImageView::wheelEvent(QWheelEvent *event)
     }
 
     scale(zoom,zoom);
+}
+
+void ImageView::mouseMoveEvent(QMouseEvent *event)
+{
+    QPointF l = mapToScene(event->pos().x(),event->pos().y());
+    qint32 x = static_cast<qint32> (l.x());
+    qint32 y = static_cast<qint32> (l.y());
+    emit showHeightToolTip(QPoint(x,y), event->globalPos());
 }
 
 void ImageView::setImage(const QPixmap &pixmap)

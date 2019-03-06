@@ -50,7 +50,7 @@ struct HeightCoordinate
 struct Area
 {
     Area() = default;
-    explicit Area(qint32 number): id(number), points(0), maxHeight(0.f) {}
+    explicit Area(qint32 number): id(number), points(0), maxHeight(HeightCoordinate()) {}
 
     Area& operator=(const Area& obj)
     {
@@ -70,14 +70,14 @@ struct Area
     }
 
     HeightCoordinate getCenterPoint();
-    float getMaxHeight(bool force = true);
+    HeightCoordinate getMaxHeight(bool force = true);
 
     qint32 id;
     QVector<HeightCoordinate> points;
 
 private:
     HeightCoordinate centerCoord;
-    float maxHeight;
+    HeightCoordinate maxHeight;
 };
 
 

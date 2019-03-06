@@ -49,17 +49,31 @@ HeightCoordinate Area::getCenterPoint()
     return centerCoord;
 }
 
-float Area::getMaxHeight(bool force)
+HeightCoordinate Area::getMaxHeight(bool force)
 {
     if (points.isEmpty())
     {
-        return 0.f;
+        return HeightCoordinate();
     }
 
-    if (maxHeight == 0.f or force)
+    if (maxHeight == HeightCoordinate() or force)
     {
-        maxHeight = (*std::max_element(points.begin(),points.end())).height;
+        maxHeight = *std::max_element(points.begin(),points.end());
     }
 
     return maxHeight;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

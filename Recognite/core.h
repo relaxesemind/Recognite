@@ -37,6 +37,7 @@ public:
     void calculateFrequenciesWithInterval(float interval);
     QVector<QPointF> calcPointsForGraph();
     void setMinObjectSize(int value);
+    void getTrueHeights(const InputModel &model, QVector<Area>& objects);
 
 signals:
 

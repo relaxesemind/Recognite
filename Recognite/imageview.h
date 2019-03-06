@@ -3,6 +3,7 @@
 
 #include "Common/consts.h"
 #include "gradientaxis.h"
+#include "staticmodel.h"
 
 #include <QObject>
 #include <QGraphicsView>
@@ -34,8 +35,10 @@ public:
 
 protected:
     void wheelEvent(QWheelEvent *event)override;
+    void mouseMoveEvent(QMouseEvent *event)override;
 
 signals:
+    void showHeightToolTip(const QPoint& matrixCoord, const QPoint& globalPos);
 
 public slots:
     void setImage(const QPixmap& pixmap);

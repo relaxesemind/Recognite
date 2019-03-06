@@ -23,19 +23,8 @@ QImage Core::imageFromTxtFile(const QString &path)
    auto& inputModels = StaticModel::shared().inputModels;
    auto pair = model.getMaxMin();
 
-//   float max = pair.first;
-//   float min = pair.second;
-
    int sizeY = model.sizeY();
    int sizeX = model.sizeX();
-
-//   model.foreachHeight([min](float& value)
-//   {
-//       value += std::abs(min);
-//   });
-
-//   model.min += std::abs(min);
-//   model.max += std::abs(min);
 
    QImage image(sizeX,sizeY,QImage::Format_RGB32);
 
@@ -106,7 +95,7 @@ void Core::calculateFrequencies(int numOfColumn)
 
     StaticModel::shared().foreachArea([&frequencies, min, max, singleInterval](Area& object)
     {
-        float height = object.getMaxHeight();
+        float height = object.getMaxHeight().height;
         int column = 0;
 
         while(height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
@@ -147,13 +136,109 @@ QVector<QPointF> Core::calcPointsForGraph()
     {
         result[i] = QPointF(i,frequencies[i]);
     }
-    qDebug() << "frequencies " << frequencies;
     return result;
 }
 
 void Core::setMinObjectSize(int value)
 {
     minObjectSize = value;
+}
+
+void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
+{
+    std::for_each(objects.begin(),objects.end(),[model](Area& area)
+    {
+        HeightCoordinate height(area.getMaxHeight());
+        int traverseSize = area.points.size();
+
+        traverseSize = traverseSize > 40 ? 5 * std::sqrt(traverseSize) : traverseSize;
+
+        //y = y0 ;x = x0
+
+        int i = 0;
+        const int step = Consts::traverseWalkStep;
+        bool traverseIsFlat = false;
+        int confidentialCounter = 0;
+        const int x1 = height.x;
+        const int y1 = height.y;
+
+        int xr = x1, xl = x1;
+        int yt = y1, yb = y1;
+
+        auto derivative = [model,step](QPoint p1, QPoint p2)->float
+        {
+            return (model.matrix[p2.y()][p2.x()] - model.matrix[p1.y()][p1.x()]) / step;
+        };
+
+        while (++i < traverseSize)
+        {
+            bool flatter = false;
+
+            if (model.isSafelyIndexes(xr + step, y1))
+            {
+                float derivativeRight = derivative(QPoint(xr,y1),QPoint(xr + step,y1));
+                xr += step;
+
+                flatter = std::abs(derivativeRight) < Consts::derivativeStability;
+            }
+
+            if (model.isSafelyIndexes(xl - step, y1))
+            {
+                float derivativeLeft = derivative(QPoint(xl,y1),QPoint(xl - step,y1));
+                xl -= step;
+
+                flatter = std::abs(derivativeLeft) < Consts::derivativeStability;
+            }
+
+            if (model.isSafelyIndexes(x1,yt - step))
+            {
+                float derivativeTop = derivative(QPoint(x1,yt),QPoint(x1,yt - step));
+                yt -= step;
+
+                flatter = std::abs(derivativeTop) < Consts::derivativeStability;
+            }
+
+            if (model.isSafelyIndexes(x1,yb + step))
+            {
+                float derivativeBottom = derivative(QPoint(x1,yb), QPoint(x1,yb + step));
+                yb += step;
+
+                flatter = std::abs(derivativeBottom) < Consts::derivativeStability;
+            }
+
+
+            if (flatter)
+            {
+                ++confidentialCounter;
+            }
+
+            if (confidentialCounter > 2)
+            {
+                traverseIsFlat = true;
+                break;
+            }
+        }
+
+        if (!traverseIsFlat)
+        {
+            return ;
+        }
+
+
+
+        float h1 = model.matrix[y1][xr];
+        float h2 = model.matrix[y1][xl];
+        float h3 = model.matrix[yt][x1];
+        float h4 = model.matrix[yb][x1];
+        float h = (h1 + h2 + h3 + h4) / 4;
+
+        qDebug() << "traverseIsFlat! h = " << h;
+
+        std::for_each(area.points.begin(),area.points.end(),[h](HeightCoordinate& coord)
+        {
+            coord.height -= h;
+        });
+    });
 }
 
 inline bool Core::inRange(qint32 x, qint32 y, const InputModel& model)

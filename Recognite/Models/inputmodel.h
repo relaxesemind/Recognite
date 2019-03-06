@@ -36,6 +36,11 @@ struct InputModel
         return *this;
     }
 
+    bool isSafelyIndexes(int x, int y) const
+    {
+        return x < sizeX() - 1 and y < sizeY() - 1 and x >= 0 and y >= 0;
+    }
+
     int sizeX() const
     {
         return matrix.isEmpty() ? 0 : matrix.first().size();

@@ -13,10 +13,12 @@ MainWindow::MainWindow(QWidget *parent) :
     taskIsRunning = false;
     modeFlag = false;
     currentImageId = -1;
+
     StaticModel::shared().lineSeparator = QChar('#');
     StaticModel::shared().numberSeparator = QChar(';');
 
     setupListWidget();
+    setupImageView();
 }
 
 MainWindow::~MainWindow()
@@ -114,6 +116,48 @@ void MainWindow::setupListWidget()
 //                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
 //                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
 //   });
+    listWidget->addItems(QStringList{
+                            "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
+                         });
+}
+
+void MainWindow::setupImageView()
+{
+    connect(ui->imageView,&ImageView::showHeightToolTip,this,[this](const QPoint& coord, const QPoint& globalPos)
+    {
+
+        auto& sources = StaticModel::shared().sources;
+
+        if (!(currentImageId < sources.count() and currentImageId >= 0))
+        {
+            return ;
+        }
+
+        QString path = sources.at(currentImageId).first;
+        auto& models = StaticModel::shared().inputModels;
+        for (InputModel& model : models)
+        {
+            if (model.path == path and model.isSafelyIndexes(coord.x(),coord.y()))
+            {
+
+                QToolTip::showText(globalPos,QString::number(model.matrix[coord.x()][coord.y()],'f',2));
+                break;
+            }
+        }
+    });
 }
 
 void MainWindow::on_loadTxtFiles_triggered()

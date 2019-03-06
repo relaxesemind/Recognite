@@ -24,6 +24,7 @@
 #include <QAction>
 #include <QCursor>
 #include <QDesktopWidget>
+#include <QToolTip>
 
 
 
@@ -74,6 +75,7 @@ private:
     void updateTableWidget();
     void makeImageFromFilePath(const QString& path);
     void setupListWidget();
+    void setupImageView();
 
 private:
     Ui::MainWindow *ui;
