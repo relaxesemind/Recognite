@@ -32,7 +32,7 @@ QImage Core::imageFromTxtFile(const QString &path)
    {
        for (int j = 0; j < sizeX; ++j)
        {
-            image.setPixel(i,j,grayScalePixel(model.colorOfHeight(j,i)));
+            image.setPixel(j,i,grayScalePixel(model.colorOfHeight(j,i)));
        }
    }
 
@@ -151,7 +151,7 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
         HeightCoordinate height(area.getMaxHeight());
         int traverseSize = area.points.size();
 
-        traverseSize = traverseSize > 40 ? 5 * std::sqrt(traverseSize) : traverseSize;
+        traverseSize = traverseSize > 40 ? 3 * std::sqrt(traverseSize) : traverseSize;
 
         //y = y0 ;x = x0
 
@@ -376,7 +376,7 @@ QImage Core::binImageFromTxtFile(const QString &path)
     {
         for (int j = 0; j < _w; ++j)
         {
-            image.setPixel(i,j,updatedLabels[i][j] ? Consts::whiteRgb : Consts::blackRgb);
+            image.setPixel(j,i,updatedLabels[i][j] ? Consts::whiteRgb : Consts::blackRgb);
         }
     }
 

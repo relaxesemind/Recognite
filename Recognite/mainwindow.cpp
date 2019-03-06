@@ -153,7 +153,7 @@ void MainWindow::setupImageView()
             if (model.path == path and model.isSafelyIndexes(coord.x(),coord.y()))
             {
 
-                QToolTip::showText(globalPos,QString::number(model.matrix[coord.x()][coord.y()],'f',2));
+                QToolTip::showText(globalPos,QString::number(model.matrix[coord.y()][coord.x()],'f',2));
                 break;
             }
         }
