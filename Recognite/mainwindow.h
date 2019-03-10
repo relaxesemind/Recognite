@@ -8,6 +8,7 @@
 #include "selectingprocessmanager.h"
 #include "staticmodel.h"
 #include "parsersettingsdialog.h"
+#include "traversewalksettings.h"
 
 
 #include <QMainWindow>
@@ -70,6 +71,8 @@ private slots:
     void on_changeShowMode_triggered();
 
     void on_actionInputFormatEdit_triggered();
+
+    void on_action_TraverseWalk_triggered();
 
 private:
     void updateTableWidget();

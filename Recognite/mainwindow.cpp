@@ -14,8 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     modeFlag = false;
     currentImageId = -1;
 
-    StaticModel::shared().lineSeparator = QChar('#');
-    StaticModel::shared().numberSeparator = QChar(';');
+    StaticModel::shared().init();
 
     setupListWidget();
     setupImageView();
@@ -46,9 +45,6 @@ void MainWindow::updateProcessPercentage(int value)
         {
             return;
         }
-
-
-//        ui->imageViewSelected->setImage(QPixmap::fromImage(dests[id].second));
 
         if (modeFlag == true)
         {
@@ -116,22 +112,22 @@ void MainWindow::setupListWidget()
 //                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
 //                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
 //   });
-    listWidget->addItems(QStringList{
-                            "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
-                         });
+//    listWidget->addItems(QStringList{
+//                            "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
+//                         });
 }
 
 void MainWindow::setupImageView()
@@ -465,12 +461,14 @@ void MainWindow::on_changeShowMode_triggered()
 
 void MainWindow::on_actionInputFormatEdit_triggered()
 {
-    ParserSettingsDialog *dialog = new ParserSettingsDialog(this);
-    dialog->show();
+    (new ParserSettingsDialog(this))->show();
 }
 
 
-
+void MainWindow::on_action_TraverseWalk_triggered()
+{
+   (new TraverseWalkSettings(this))->show();
+}
 
 
 

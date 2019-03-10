@@ -569,12 +569,15 @@
     <addaction name="separator"/>
     <addaction name="action"/>
     <addaction name="changeShowMode"/>
+    <addaction name="separator"/>
+    <addaction name="action_3"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>Настройки</string>
     </property>
     <addaction name="actionInputFormatEdit"/>
+    <addaction name="action_TraverseWalk"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -606,6 +609,16 @@
   <action name="actionInputFormatEdit">
    <property name="text">
     <string>Изменить формат входных данных</string>
+   </property>
+  </action>
+  <action name="action_TraverseWalk">
+   <property name="text">
+    <string>Параметры TraverseWalk</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>Открыть лог</string>
    </property>
   </action>
  </widget>

@@ -6,6 +6,7 @@ ImageView::ImageView(QWidget* widget) : QGraphicsView(widget)
     this->setAlignment(Qt::AlignCenter);
     currentMode = ImageViewMode::sourceAndDestsView;
     currentScale = 1.0;
+    opacity = 1.0;
     layout = nullptr;
     this->setMouseTracking(true);
     setupSlider();
@@ -58,6 +59,7 @@ void ImageView::setBinaryImage(const QPixmap &pixmap)
 {
     currentBinaryItem = std::make_unique<PXitem>(pixmap);
     scene.addItem(currentBinaryItem.get());
+    currentBinaryItem->setOpacity(opacity);
     ImageView::centerOn(currentBinaryItem.get());
     ImageView::fitInView(currentBinaryItem.get(),Qt::KeepAspectRatio);
     update();
@@ -108,8 +110,9 @@ void ImageView::setupSlider()
     connect(slider,&QSlider::valueChanged,this,[this](int value){
         if (currentBinaryItem and currentBinaryItem->scene() == &scene)
         {
-            qreal opacity = qreal(value) / 100;
-            currentBinaryItem->setOpacity(opacity);
+            qreal op = qreal(value) / 100;
+            opacity = op;
+            currentBinaryItem->setOpacity(op);
         }
     });
 }

@@ -156,7 +156,8 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
         //y = y0 ;x = x0
 
         int i = 0;
-        const int step = Consts::traverseWalkStep;
+        const int step = StaticModel::shared().traverseWalkStep;
+        const float stability = StaticModel::shared().derivativeStability;
         bool traverseIsFlat = false;
         int confidentialCounter = 0;
         const int x1 = height.x;
@@ -179,7 +180,7 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
                 float derivativeRight = derivative(QPoint(xr,y1),QPoint(xr + step,y1));
                 xr += step;
 
-                flatter = std::abs(derivativeRight) < Consts::derivativeStability;
+                flatter = std::abs(derivativeRight) < stability;
             }
 
             if (model.isSafelyIndexes(xl - step, y1))
@@ -187,7 +188,7 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
                 float derivativeLeft = derivative(QPoint(xl,y1),QPoint(xl - step,y1));
                 xl -= step;
 
-                flatter = std::abs(derivativeLeft) < Consts::derivativeStability;
+                flatter = std::abs(derivativeLeft) < stability;
             }
 
             if (model.isSafelyIndexes(x1,yt - step))
@@ -195,7 +196,7 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
                 float derivativeTop = derivative(QPoint(x1,yt),QPoint(x1,yt - step));
                 yt -= step;
 
-                flatter = std::abs(derivativeTop) < Consts::derivativeStability;
+                flatter = std::abs(derivativeTop) < stability;
             }
 
             if (model.isSafelyIndexes(x1,yb + step))
@@ -203,7 +204,7 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
                 float derivativeBottom = derivative(QPoint(x1,yb), QPoint(x1,yb + step));
                 yb += step;
 
-                flatter = std::abs(derivativeBottom) < Consts::derivativeStability;
+                flatter = std::abs(derivativeBottom) < stability;
             }
 
 
@@ -224,8 +225,6 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
             return ;
         }
 
-
-
         float h1 = model.matrix[y1][xr];
         float h2 = model.matrix[y1][xl];
         float h3 = model.matrix[yt][x1];
@@ -233,6 +232,7 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
         float h = (h1 + h2 + h3 + h4) / 4;
 
         qDebug() << "traverseIsFlat! h = " << h;
+//        std::cout << "walk is flat! (" << height.x << "," << height.y << ") h = " << h << std::endl;
 
         std::for_each(area.points.begin(),area.points.end(),[h](HeightCoordinate& coord)
         {

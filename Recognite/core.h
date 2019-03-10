@@ -15,6 +15,8 @@
 #include <QByteArray>
 #include <QRgb>
 #include <QPointF>
+//#include <iostream>
+
 #include "Common/magic.h"
 #include "Models/models.h"
 #include "Managers/parser.h"

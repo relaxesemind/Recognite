@@ -20,6 +20,7 @@ class StaticModel : public QObject
     MakeSingletonFromClass(StaticModel)
 
 public:
+        void init();
         template<class lambda> void foreachArea(lambda call)
         {
             std::for_each(objectsMap.begin(),objectsMap.end(),[&](QVector<Area>& singleImageObjects)
@@ -45,6 +46,8 @@ public:
          QString,
          QVector<Area>
          > objectsMap;
+    float derivativeStability; /* если разница производных меньше этой константы они считаются равными */
+    int traverseWalkStep; /* размер шага в пикселях для алгоритма расширения области пика объекта (поиск истинной высоты) */
 
 private:
     int sumFreq;

@@ -7,6 +7,7 @@
 QT       += core gui charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+#CONFIG += console
 
 VERSION = 1.0.0.1
 QMAKE_TARGET_PRODUCT = RecogniteApp
@@ -20,7 +21,7 @@ TEMPLATE = app
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
-RC_ICONS = icon1.ico
+RC_ICONS = $${_PRO_FILE_PWD_}/resources/icon1.ico
 
 #INCLUDEPATH += open_cv/include
 
@@ -51,7 +52,8 @@ SOURCES += \
     selectingprocessmanager.cpp \
     staticmodel.cpp \
     gradientaxis.cpp \
-    parsersettingsdialog.cpp
+    parsersettingsdialog.cpp \
+    traversewalksettings.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -68,12 +70,14 @@ HEADERS += \
     Common/consts.h \
     staticmodel.h \
     gradientaxis.h \
-    parsersettingsdialog.h
+    parsersettingsdialog.h \
+    traversewalksettings.h
 
 FORMS += \
         mainwindow.ui \
     diagramwindow.ui \
-    parsersettingsdialog.ui
+    parsersettingsdialog.ui \
+    traversewalksettings.ui
 
 RESOURCES += \
     resources/resources.qrc

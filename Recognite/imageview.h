@@ -54,6 +54,7 @@ private:
     pItem currentImageItem;
     pItem currentBinaryItem;
     QSlider *opacitySlider;
+    qreal opacity;
 
     QGraphicsProxyWidget *proxyAxis;
     QHBoxLayout *layout;
