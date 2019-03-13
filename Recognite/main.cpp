@@ -1,8 +1,5 @@
-#include "mainwindow.h"
+#include "Controllers/mainwindow.h"
 #include <QApplication>
-
-//#include "staticmodel.h"
-//#include "core.h"
 
 int main(int argc, char *argv[])
 {

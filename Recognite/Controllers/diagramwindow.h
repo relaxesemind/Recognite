@@ -13,6 +13,7 @@
 #include "core.h"
 #include "staticmodel.h"
 #include "Common/magic.h"
+#include "Common/currentappstate.h"
 
 
 namespace Ui {

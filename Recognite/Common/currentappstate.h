@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include "Views/ImageView/imageviewmode.h"
 
+
 class CurrentAppState
 {
 public:
@@ -27,8 +28,8 @@ public:
    bool selectingTaskIsRunning; // поток с выделением областей
    ImageViewMode imageViewMode;
 
-   QStringList getAllFolderFiles() const;
-x
+   QStringList getCurrentSeriaFiles() const;
+
 };
 
 #endif // CURRENTAPPSTATE_H

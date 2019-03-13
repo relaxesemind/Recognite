@@ -6,7 +6,7 @@ CurrentAppState::CurrentAppState():
 
 }
 
-QStringList CurrentAppState::getAllFolderFiles() const
+QStringList CurrentAppState::getCurrentSeriaFiles() const
 {
     QStringList filePaths;
 

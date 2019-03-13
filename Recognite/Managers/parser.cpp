@@ -45,7 +45,7 @@ InputModel Parser::inputModelFromFile(const QString &path, int id)
         repeat(j,numbers.count())
         {
             QString number = numbers.at(j);
-            float height = number.toFloat() * 1000;
+            float height = number.toFloat() * 1000; // перевод в нанометры
             matrix[i][j] = height;
         }
     }

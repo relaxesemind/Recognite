@@ -14,14 +14,12 @@ QImage Core::imageFromTxtFile(const QString &path)
 
    InputModel model = parser.inputModelFromFile(path);
 
-
    if (!model.isValid())
    {
        return QImage();
    }
 
    auto& inputModels = StaticModel::shared().inputModels;
-   auto pair = model.getMaxMin();
 
    int sizeY = model.sizeY();
    int sizeX = model.sizeX();
@@ -69,17 +67,23 @@ std::pair<float, float> Core::findAbsoluteMaxMinHeights()
     return std::make_pair(max,min);
 }
 
-void Core::calculateFrequencies(int numOfColumn)
+void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 {
-    if (numOfColumn <= 0)
+    if (numOfColumn <= 0 || seriaPath.isEmpty())
     {
         return;
     }
 
-    qDebug() << "start calculateFrequencies";
+    auto it = StaticModel::shared().frequencies.find(seriaPath);
 
+    if (it == StaticModel::shared().frequencies.end())
+    {
+        return;
+    }
+
+    auto& frequencies = *it;
     auto& objects = StaticModel::shared().objectsMap;
-    auto& frequencies = StaticModel::shared().frequencies;
+
     float max = StaticModel::shared().absoluteMAXheight;
     float min = StaticModel::shared().absoluteMINheight;
 
@@ -110,11 +114,9 @@ void Core::calculateFrequencies(int numOfColumn)
         }
 
     });
-
-    qDebug() << "end calculateFrequencies";
 }
 
-void Core::calculateFrequenciesWithInterval(float interval)
+void Core::calculateFrequenciesWithInterval(const QString &seriaPath, float interval)
 {
     if (interval < 0.0001f)
     {
@@ -124,12 +126,18 @@ void Core::calculateFrequenciesWithInterval(float interval)
     float max = StaticModel::shared().absoluteMAXheight;
     float min = StaticModel::shared().absoluteMINheight;
     int columns = static_cast<int>((max - min) / interval);
-    this->calculateFrequencies(columns);
+    this->calculateFrequencies(seriaPath,columns);
 }
 
-QVector<QPointF> Core::calcPointsForGraph()
+QVector<QPointF> Core::calcPointsForGraph(const QString &seriaPath)
 {
-    auto& frequencies = StaticModel::shared().frequencies;
+    auto it = StaticModel::shared().frequencies.find(seriaPath);
+    if (it == StaticModel::shared().frequencies.end())
+    {
+        return QVector<QPointF>();
+    }
+
+    auto& frequencies = *it;
     QVector<QPointF> result(frequencies.size());
 
     repeat(i,frequencies.size())
@@ -247,7 +255,7 @@ inline bool Core::inRange(qint32 x, qint32 y, const InputModel& model)
     return  height <= maxFromUI and height >= minFromUI;
 }
 
-void Core::fill(const InputModel &model, QVector<QVector<qint32>>& V, qint32 x, qint32 y, qint32 L)
+void Core::fill(const InputModel& model, QVector<QVector<qint32>>& V, qint32 x, qint32 y, qint32 L)
 {
     if (!model.isValid())
     {

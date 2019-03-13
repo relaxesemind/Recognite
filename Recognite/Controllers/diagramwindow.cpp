@@ -40,29 +40,29 @@ void DiagramWindow::on_pushButton_clicked()//recalc
 //    QString text = ui->lineEdit->text();
     int value = ui->horizontalSlider->value();
     float fValue = static_cast<float>(value) / 100;
-    Core::shared().calculateFrequenciesWithInterval(fValue);
+//    Core::shared().calculateFrequenciesWithInterval(CurrentAppState::shared().currentFolder, fValue);
     drawGraph();
 }
 
 void DiagramWindow::drawGraph()
 {
-    Grapher::shared().clearView();
-    pointsForGraph = Core::shared().calcPointsForGraph();
-    float max = StaticModel::shared().absoluteMAXheight;
-    float min = StaticModel::shared().absoluteMINheight;
-    auto pair = StaticModel::shared().getMaxMinFrequencies();
-    int sum = StaticModel::shared().getAccumulateFreq();
+//    Grapher::shared().clearView();
+//    pointsForGraph = Core::shared().calcPointsForGraph();
+//    float max = StaticModel::shared().absoluteMAXheight;
+//    float min = StaticModel::shared().absoluteMINheight;
+//    auto pair = StaticModel::shared().getMaxMinFrequencies();
+//    int sum = StaticModel::shared().getAccumulateFreq();
 
-    int yMin = pair.second;
-    int yMax = pair.first;
+//    int yMin = pair.second;
+//    int yMax = pair.first;
 
-    qDebug() << "sum = " << sum;
-    qDebug() << "ymin = " << yMin << " yMax = " << yMax;
+//    qDebug() << "sum = " << sum;
+//    qDebug() << "ymin = " << yMin << " yMax = " << yMax;
 
-    Grapher::shared().setXRange(min,max);
-    Grapher::shared().setYRange(static_cast<float>(yMin)/static_cast<float>(sum),
-                                static_cast<float>(yMax)/static_cast<float>(sum));
-    Grapher::shared().addPointsAtGraph(pointsForGraph,mode);
+//    Grapher::shared().setXRange(min,max);
+//    Grapher::shared().setYRange(static_cast<float>(yMin)/static_cast<float>(sum),
+//                                static_cast<float>(yMax)/static_cast<float>(sum));
+//    Grapher::shared().addPointsAtGraph(pointsForGraph,mode);
 }
 
 void DiagramWindow::writeDataToStream(QTextStream& out)

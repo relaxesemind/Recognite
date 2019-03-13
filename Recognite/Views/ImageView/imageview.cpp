@@ -4,12 +4,12 @@ ImageView::ImageView(QWidget* widget) : QGraphicsView(widget)
 {
     this->setScene(&scene);
     this->setAlignment(Qt::AlignCenter);
-    currentMode = ImageViewMode::sourceAndDestsView;
     currentScale = 1.0;
     opacity = 1.0;
     layout = nullptr;
     this->setMouseTracking(true);
     setupSlider();
+    showSlider(false);
 }
 
 void ImageView::wheelEvent(QWheelEvent *event)
@@ -81,21 +81,9 @@ void ImageView::addGradientAxis(float min, float max)
     this->setLayout(layout);
 }
 
-void ImageView::setMode(ImageViewMode mode)
+void ImageView::showSlider(bool flag)
 {
-    currentMode = mode;
-
-    if (currentMode == ImageViewMode::sourceAndDestsView)
-    {
-        opacitySlider->setHidden(true);
-        currentBinaryItem = nullptr;
-    }
-
-    if (currentMode == ImageViewMode::transparentOver)
-    {
-        opacitySlider->setHidden(false);
-
-    }
+    opacitySlider->setHidden(!flag);
 }
 
 void ImageView::setupSlider()
@@ -117,10 +105,6 @@ void ImageView::setupSlider()
     });
 }
 
-ImageViewMode ImageView::getCurrentMode() const
-{
-    return currentMode;
-}
 
 
 

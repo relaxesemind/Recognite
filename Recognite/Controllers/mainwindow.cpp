@@ -10,11 +10,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->menuBar->setNativeMenuBar(false);
     selectingTask = nullptr;
-    taskIsRunning = false;
-    modeFlag = false;
-    currentImageId = -1;
-
-    StaticModel::shared().init();
 
     setupListWidget();
     setupImageView();
@@ -34,29 +29,6 @@ void MainWindow::updateProcessPercentage(int value)
     if (value == 100)
     {
         bar->setValue(0);
-//        QList<QTableWidgetItem *> list = ui->tableWidget->selectedItems();
-//        if (list.isEmpty())
-//        {
-//            return;
-//        }
-
-//        int id = list.first()->column();
-//        if (id < 0 or id > dests.count() - 1)
-//        {
-//            return;
-//        }
-
-//        if (modeFlag == true)
-//        {
-//            if (currentImageId < dests.count() - 1 and currentImageId >= 0)
-//            {
-//                ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(currentImageId).second));
-//            }
-//        }
-//        else
-//        {
-//            ui->imageViewSelected->setImage(QPixmap::fromImage(dests[id].second));
-//        }
 
     }
     else
@@ -68,11 +40,6 @@ void MainWindow::updateProcessPercentage(int value)
 void MainWindow::enableDiagramButton(bool flag)
 {
     ui->diagramPushButton->setEnabled(flag);
-}
-
-void MainWindow::setTaskIsRunning(bool flag)
-{
-    taskIsRunning = flag;
 }
 
 void MainWindow::makeImageFromFilePath(const QString &path)
@@ -91,7 +58,6 @@ void MainWindow::setupListWidget()
     QListWidget *listWidget = ui->listWidget;
     listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->imageView->addGradientAxis(0,0);
-
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
 }
 
@@ -101,11 +67,6 @@ void MainWindow::setupImageView()
     {
 
         auto& sources = StaticModel::shared().sources;
-
-        if (!(currentImageId < sources.count() and currentImageId >= 0))
-        {
-            return ;
-        }
 
 //        QString path = sources.at(currentImageId).first;
 //        auto& models = StaticModel::shared().inputModels;
@@ -133,6 +94,9 @@ void MainWindow::on_loadTxtFiles_triggered()
     }
 
     ui->listWidget->addItem(path);
+
+    StaticModel::shared().folders.append(path);
+    CurrentAppState::shared().currentFolder = path;
 }
 
 void MainWindow::on_maxHeightSlider_valueChanged(int value)
@@ -206,37 +170,33 @@ void MainWindow::on_pushButton_clicked()//build images
     for (int i = 0; i < listWidget->count(); ++i)
     {
            QString path = listWidget->item(i)->text();
-           QStringList filePaths;
-
            QDir folder(path);
-           folder.setFilter(QDir::Files);
-           folder.setSorting(QDir::Name);
 
-           QFileInfoList folderitems(folder.entryInfoList());
+           if (!folder.exists())
+           {
+               continue;
+           }
 
-               foreach (QFileInfo i_file, folderitems)
-               {
-                   QString i_filename(i_file.fileName());
-                   if (i_filename == "." || i_filename == ".." || i_filename.isEmpty())
-                   {
-                       continue;
-                   }
+           CurrentAppState::shared().currentFolder = path;
+           QStringList filePaths = CurrentAppState::shared().getCurrentSeriaFiles();
 
-                   filePaths << i_file.absoluteFilePath();
-               }
-           qDebug() << filePaths;
-
-           foreach (QString path, filePaths)
+           std::for_each(filePaths.begin(),filePaths.end(),[this](const QString& path)
            {
                this->makeImageFromFilePath(path);
-           }
+           });
     }
 
+    // inputModels and sources is ready
 
     if (!sources.isEmpty())
     {
-        ui->imageView->setImage(QPixmap::fromImage(sources.first()));
-        currentImageId = 0;
+        auto firstIt = sources.begin();
+        ui->imageView->setImage(QPixmap::fromImage(firstIt.value()));
+        CurrentAppState::shared().currentFilePath = firstIt.key();
+    }
+    else
+    {
+        return;
     }
 
 
@@ -248,7 +208,6 @@ void MainWindow::on_pushButton_clicked()//build images
    QString max = QString::number(pair.first);
    QString min = QString::number(pair.second);
    int interval = static_cast<int>((maxNumber - minNumber) / 30);
-
 
    ui->label_4->setText(QString("Абсолютный MAX = ") + max + QString("нм"));
    ui->label_5->setText(QString("Абсолютный MIN = ") + min + QString("нм"));
@@ -265,61 +224,103 @@ void MainWindow::on_pushButton_clicked()//build images
 void MainWindow::updateTableWidget()
 {
     QTableWidget *table = ui->tableWidget;
+    QString folder = CurrentAppState::shared().currentFolder;
     auto& sources = StaticModel::shared().sources;
 
+    QStringList files = CurrentAppState::shared().getCurrentSeriaFiles();
+
+    table->clear();
     table->setColumnCount(sources.count());
     table->setRowCount(1);
     const int imgSize = Consts::previewSourceImageHeight;
 
-    for (int i = 0; i < sources.count(); ++i)
+    for (int i = 0; i < files.count(); ++i)
     {
         QTableWidgetItem *item = new QTableWidgetItem;
         table->setRowHeight(i,imgSize + 5);
         table->setColumnWidth(i,imgSize + 5);
-        item->setData(Qt::DecorationRole,QPixmap::fromImage(sources.at(i).second).scaled(imgSize,imgSize,Qt::KeepAspectRatio));
+        auto it = sources.find(files[i]);
+
+        if (it == sources.end())
+        {
+            continue;
+        }
+
+        item->setData(Qt::DecorationRole,QPixmap::fromImage(it.value()).scaled(imgSize,imgSize,Qt::KeepAspectRatio));
         table->setItem(0,i,item);
+    }
+}
+
+void MainWindow::updateViewWithSeria()
+{
+    updateTableWidget();
+    updateImageViews();
+}
+
+void MainWindow::updateImageViews()
+{
+    auto& source = StaticModel::shared().sources;
+    QImage sourceImage = StaticModel::shared().getCurrentImage();
+    QImage binImage = StaticModel::shared().getCurrentBinImage();
+
+    switch (CurrentAppState::shared().imageViewMode) {
+    case ImageViewMode::sourceAndDestsView:
+           ui->imageView->setImage(QPixmap::fromImage(sourceImage));
+           ui->imageViewSelected->setImage(QPixmap::fromImage(binImage));
+           ui->imageViewSelected->setHidden(false);
+           ui->widget_2->setHidden(false);
+           ui->imageView->showSlider(false);
+        break;
+    case ImageViewMode::transparentOver:
+           ui->imageView->setImage(QPixmap::fromImage(sourceImage));
+           ui->imageView->setBinaryImage(QPixmap::fromImage(binImage));
+           ui->imageView->showSlider(true);
+           ui->widget_2->setHidden(true);
+           ui->imageViewSelected->setHidden(true);
+        break;
+    default:
+        break;
     }
 }
 
 void MainWindow::on_tableWidget_clicked(const QModelIndex &index)
 {
     int id = index.column();
-    currentImageId = id;
-    auto& sources = StaticModel::shared().sources;
-    auto& dests = StaticModel::shared().dests;
-    ImageViewMode mode = ui->imageView->getCurrentMode();
+    QVector<QImage> sources = StaticModel::shared().getCurrentSeriaImages();
+    QVector<QImage> dests = StaticModel::shared().getCurrentSeriaBinImages();
 
-    if (id < 0 or id > sources.count() - 1)
-    {
-        return;
-    }
+//    if (id < 0 or id > sources.count() - 1)
+//    {
+//        return;
+//    }
 
 
-    if (mode == ImageViewMode::sourceAndDestsView)
-    {
-        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
-        if (id > dests.count() - 1)
-        {
-            return;
-        }
-        ui->imageViewSelected->setImage(QPixmap::fromImage(dests.at(id).second));
-    }
+//    if (mode == ImageViewMode::sourceAndDestsView)
+//    {
+//        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
+//        if (id > dests.count() - 1)
+//        {
+//            return;
+//        }
+//        ui->imageViewSelected->setImage(QPixmap::fromImage(dests.at(id).second));
+//    }
 
-    if (mode == ImageViewMode::transparentOver)
-    {
-        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
-        if (id > dests.count() - 1)
-        {
-            return;
-        }
-        ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(id).second));
-    }
+//    if (mode == ImageViewMode::transparentOver)
+//    {
+//        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
+//        if (id > dests.count() - 1)
+//        {
+//            return;
+//        }
+//        ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(id).second));
+//    }
 }
 
 void MainWindow::on_processPushButton_clicked()
 {
     auto& sources = StaticModel::shared().sources;
     auto& dests = StaticModel::shared().dests;
+    bool isRunning = CurrentAppState::shared().selectingTaskIsRunning;
 
     if (sources.isEmpty())
     {
@@ -327,7 +328,7 @@ void MainWindow::on_processPushButton_clicked()
         return;
     }
 
-    if (taskIsRunning)
+    if (isRunning)
     {
         qDebug () << "task is running";
         return;
@@ -339,12 +340,7 @@ void MainWindow::on_processPushButton_clicked()
     Core::shared().setRange(static_cast<float>(min) / 10.f,static_cast<float>(max) / 10.f);
     Core::shared().setMinObjectSize(minObjSize);
 
-    QStringList paths;
-
-    for (int i = 0; i < sources.count(); ++i)
-    {
-        paths << sources[i].first;
-    }
+    QStringList paths = CurrentAppState::shared().getCurrentSeriaFiles();
 
     if (paths.isEmpty())
     {
@@ -357,7 +353,9 @@ void MainWindow::on_processPushButton_clicked()
     connect(selectingTask,&SelectingProcessManager::destPair,&StaticModel::shared(),&StaticModel::addDestPair);
     connect(selectingTask,&SelectingProcessManager::setEnableDiagram,this,&MainWindow::enableDiagramButton);
     connect(selectingTask,&SelectingProcessManager::processPercent,this,&MainWindow::updateProcessPercentage);
-    connect(selectingTask,&SelectingProcessManager::isRunning,this,&MainWindow::setTaskIsRunning);
+    connect(selectingTask,&SelectingProcessManager::isRunning,this,[](bool isRunning){
+        CurrentAppState::shared().selectingTaskIsRunning = isRunning;
+    });
 
     pool->start(selectingTask);
     updateTableWidget();
@@ -367,9 +365,8 @@ void MainWindow::on_processPushButton_clicked()
 void MainWindow::on_diagramPushButton_clicked()
 {
     Grapher::shared().clearView();
-    Core::shared().calculateFrequenciesWithInterval(0.3f);
-    DiagramWindow *diagram = new DiagramWindow(this);
-    diagram->show();
+    Core::shared().calculateFrequenciesWithInterval(CurrentAppState::shared().currentFolder,0.3f);
+    (new DiagramWindow(this))->show();
 }
 
 void MainWindow::showListMenuAtPos(QPoint pos)
@@ -419,34 +416,23 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         destView->setImage(QPixmap());
         StaticModel::shared().dropModel();
     });
-///
+
     menu.addActions(QList<QAction *>{removeAction, addItemAction,removeAll});
     menu.exec(globalPos);
 }
 
 void MainWindow::on_changeShowMode_triggered()
 {
-    modeFlag = !modeFlag;
-    ImageViewMode mode;
-    auto& dests = StaticModel::shared().dests;
-
-    if (modeFlag == true)
-    {
-        mode = ImageViewMode::transparentOver;
-        if (currentImageId < dests.count() - 1 and currentImageId >= 0)
-        {
-            ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(currentImageId).second));
-        }
-    }
-    else
-    {
-        mode = ImageViewMode::sourceAndDestsView;
-    }
-
-    ui->imageViewSelected->setHidden(modeFlag);
-    ui->widget_2->setHidden(modeFlag);
-    ui->widget->setHidden(modeFlag);
-    ui->imageView->setMode(mode);
+   ImageViewMode& mode = CurrentAppState::shared().imageViewMode;
+   if (mode == ImageViewMode::transparentOver)
+   {
+       mode = ImageViewMode::sourceAndDestsView;
+   }
+   else if (mode == ImageViewMode::sourceAndDestsView)
+   {
+       mode = ImageViewMode::transparentOver;
+   }
+   updateViewWithSeria();
 }
 
 void MainWindow::on_actionInputFormatEdit_triggered()
@@ -458,6 +444,17 @@ void MainWindow::on_actionInputFormatEdit_triggered()
 void MainWindow::on_action_TraverseWalk_triggered()
 {
    (new TraverseWalkSettings(this))->show();
+}
+
+void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
+{
+    QString folderPath = item->text();
+    if (!folderPath.isEmpty())
+    {
+        CurrentAppState::shared().currentFolder = folderPath;
+        CurrentAppState::shared().currentFilePath = CurrentAppState::shared().getCurrentSeriaFiles().first();
+        updateViewWithSeria();
+    }
 }
 
 

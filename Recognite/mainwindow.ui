@@ -229,7 +229,7 @@
          <string notr="true"/>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -255,7 +255,7 @@
              <string notr="true">color : rgb(255, 255, 255)</string>
             </property>
             <property name="text">
-             <string>txt файлы</string>
+             <string>Серии</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -558,7 +558,7 @@
      <x>0</x>
      <y>0</y>
      <width>1033</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -593,7 +593,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="loadTxtFiles">
    <property name="text">
-    <string>Загрузить txt файлы</string>
+    <string>Добавить серию</string>
    </property>
   </action>
   <action name="action">

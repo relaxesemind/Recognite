@@ -5,10 +5,12 @@
 #include "diagramwindow.h"
 #include "Managers/parser.h"
 #include "core.h"
-#include "selectingprocessmanager.h"
+#include "Managers/selectingprocessmanager.h"
 #include "staticmodel.h"
 #include "parsersettingsdialog.h"
 #include "traversewalksettings.h"
+#include "Common/currentappstate.h"
+#include "Views/ImageView/imageview.h"
 
 
 #include <QMainWindow>
@@ -46,7 +48,6 @@ public:
 public slots:
     void updateProcessPercentage(int);
     void enableDiagramButton(bool);
-    void setTaskIsRunning(bool);
 
 private slots:
 
@@ -76,8 +77,12 @@ private slots:
 
     void on_action_TraverseWalk_triggered();
 
+    void on_listWidget_itemClicked(QListWidgetItem *item);
+
 private:
     void updateTableWidget();
+    void updateViewWithSeria();
+    void updateImageViews();
     void makeImageFromFilePath(const QString& path);
     void setupListWidget();
     void setupImageView();
@@ -86,9 +91,6 @@ private:
     Ui::MainWindow *ui;
     QThreadPool *pool;
     SelectingProcessManager *selectingTask;
-    int currentImageId;
-    bool taskIsRunning;
-    bool modeFlag;
 };
 
 #endif // MAINWINDOW_H

@@ -18,14 +18,11 @@ void SelectingProcessManager::run()
        auto& models = StaticModel::shared().inputModels;
        QImage dest = Core::shared().binImageFromTxtFile(path);
 
-       for (InputModel& model : models)
-       {
-           if (model.path == path)
-           {
-               Core::shared().getTrueHeights(model,*StaticModel::shared().objectsMap.find(path));
-           }
-       }
+       auto it = std::find_if(models.begin(),models.end(),[path](const InputModel& model)->bool{
+           return model.path == path;
+       });
 
+       Core::shared().getTrueHeights(*it,*StaticModel::shared().objectsMap.find(path));
        emit destPair(path,dest);
        emit processPercent((1 + i) * 100 / paths.count());
     }

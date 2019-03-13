@@ -2,7 +2,8 @@
 #define IMAGEVIEW_H
 
 #include "Common/consts.h"
-#include "gradientaxis.h"
+#include "Views/GradientAxis/gradientaxis.h"
+#include "Views/ImageView/imageviewmode.h"
 #include "staticmodel.h"
 
 #include <QObject>
@@ -16,11 +17,6 @@
 #include <QLabel>
 #include <QSlider>
 
-enum class ImageViewMode : int
-{
-     sourceAndDestsView = 0,
-     transparentOver = 1
-};
 
 class ImageView : public QGraphicsView
 {
@@ -30,8 +26,6 @@ class ImageView : public QGraphicsView
     using pItem = std::unique_ptr<PXitem>;
 public:
     explicit ImageView(QWidget* widget = nullptr);
-
-    ImageViewMode getCurrentMode() const;
 
 protected:
     void wheelEvent(QWheelEvent *event)override;
@@ -44,7 +38,7 @@ public slots:
     void setImage(const QPixmap& pixmap);
     void setBinaryImage(const QPixmap& pixmap);
     void addGradientAxis(float min, float max);
-    void setMode(ImageViewMode mode);
+    void showSlider(bool flag);
 
 private:
     void setupSlider();
@@ -60,7 +54,6 @@ private:
     QHBoxLayout *layout;
     GradientAxis *axis;
 
-    ImageViewMode currentMode;
     bool isAxisVisible;
     float minValue, maxValue;
 };
