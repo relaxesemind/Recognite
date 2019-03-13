@@ -2,7 +2,7 @@
 #define PARSERSETTINGSDIALOG_H
 
 #include <QDialog>
-#include "staticmodel.h"
+#include "Common/settingsstorage.h"
 
 
 namespace Ui {

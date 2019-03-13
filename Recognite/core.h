@@ -22,6 +22,7 @@
 #include "Managers/parser.h"
 #include "Common/consts.h"
 #include "staticmodel.h"
+#include "Common/settingsstorage.h"
 
 
 class Core : public QObject

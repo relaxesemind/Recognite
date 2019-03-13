@@ -2,10 +2,7 @@
 
 void StaticModel::init()
 {
-    lineSeparator = QChar('#');
-    numberSeparator = QChar(';');
-    derivativeStability = 0.05f;
-    traverseWalkStep = 1;
+
 }
 
 std::pair<int, int> StaticModel::getMaxMinFrequencies() const

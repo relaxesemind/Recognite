@@ -53,7 +53,8 @@ SOURCES += \
     staticmodel.cpp \
     gradientaxis.cpp \
     parsersettingsdialog.cpp \
-    traversewalksettings.cpp
+    traversewalksettings.cpp \
+    Common/settingsstorage.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -71,7 +72,8 @@ HEADERS += \
     staticmodel.h \
     gradientaxis.h \
     parsersettingsdialog.h \
-    traversewalksettings.h
+    traversewalksettings.h \
+    Common/settingsstorage.h
 
 FORMS += \
         mainwindow.ui \

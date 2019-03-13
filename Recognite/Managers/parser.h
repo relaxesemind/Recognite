@@ -8,7 +8,7 @@
 
 #include "Common/magic.h"
 #include "Models/inputmodel.h"
-#include "staticmodel.h"
+#include "Common/settingsstorage.h"
 
 
 class Parser : public QObject

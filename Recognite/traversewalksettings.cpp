@@ -6,8 +6,8 @@ TraverseWalkSettings::TraverseWalkSettings(QWidget *parent) :
     ui(new Ui::TraverseWalkSettings)
 {
     ui->setupUi(this);
-    ui->lineEdit_2->setText(QString::number(StaticModel::shared().traverseWalkStep));
-    ui->lineEdit->setText(QString::number(StaticModel::shared().derivativeStability,'f',2));
+    ui->lineEdit_2->setText(QString::number(SettingsStorage::shared().traverseWalkStep));
+    ui->lineEdit->setText(QString::number(SettingsStorage::shared().derivativeStability,'f',2));
 }
 
 TraverseWalkSettings::~TraverseWalkSettings()
@@ -25,7 +25,6 @@ void TraverseWalkSettings::on_buttonBox_accepted()
         return;
     }
 
-    StaticModel::shared().traverseWalkStep = walkSize.toInt();
-    StaticModel::shared().derivativeStability = deriv.toFloat();
-
+    SettingsStorage::shared().traverseWalkStep = walkSize.toInt();
+    SettingsStorage::shared().derivativeStability = deriv.toFloat();
 }

@@ -40,14 +40,11 @@ public:
     float absoluteMINheight;
     QVector<int> frequencies;
     QVector<std::pair<QString,QImage>> sources, dests;
-    QChar numberSeparator, lineSeparator;
     QVector<InputModel> inputModels;
     QMap <
          QString,
          QVector<Area>
          > objectsMap;
-    float derivativeStability; /* если разница производных меньше этой константы они считаются равными */
-    int traverseWalkStep; /* размер шага в пикселях для алгоритма расширения области пика объекта (поиск истинной высоты) */
 
 private:
     int sumFreq;

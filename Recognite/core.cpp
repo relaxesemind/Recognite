@@ -156,8 +156,8 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
         //y = y0 ;x = x0
 
         int i = 0;
-        const int step = StaticModel::shared().traverseWalkStep;
-        const float stability = StaticModel::shared().derivativeStability;
+        const int step = SettingsStorage::shared().traverseWalkStep;
+        const float stability = SettingsStorage::shared().derivativeStability;
         bool traverseIsFlat = false;
         int confidentialCounter = 0;
         const int x1 = height.x;

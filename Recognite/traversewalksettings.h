@@ -2,7 +2,7 @@
 #define TRAVERSEWALKSETTINGS_H
 
 #include <QDialog>
-#include "staticmodel.h"
+#include "Common/settingsstorage.h"
 #include <iostream>
 
 namespace Ui {

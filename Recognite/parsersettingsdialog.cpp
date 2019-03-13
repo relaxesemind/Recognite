@@ -26,6 +26,6 @@ void ParserSettingsDialog::on_buttonBox_accepted()
     QChar lineSeparator = lineText.at(0);;
     QChar numberSeparator = numberText.at(0);
 
-    StaticModel::shared().lineSeparator = lineSeparator;
-    StaticModel::shared().numberSeparator = numberSeparator;
+    SettingsStorage::shared().lineSeparator = lineSeparator;
+    SettingsStorage::shared().numberSeparator = numberSeparator;
 }

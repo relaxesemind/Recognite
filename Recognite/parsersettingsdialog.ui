@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>174</width>
-    <height>140</height>
+    <width>210</width>
+    <height>138</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
         <widget class="QLineEdit" name="lineEdit">
          <property name="maximumSize">
           <size>
-           <width>40</width>
+           <width>50</width>
            <height>16777215</height>
           </size>
          </property>
@@ -37,7 +37,7 @@
           <string>#</string>
          </property>
          <property name="maxLength">
-          <number>1</number>
+          <number>3</number>
          </property>
         </widget>
        </item>
@@ -56,7 +56,7 @@
         <widget class="QLineEdit" name="lineEdit_2">
          <property name="maximumSize">
           <size>
-           <width>40</width>
+           <width>50</width>
            <height>16777215</height>
           </size>
          </property>
@@ -64,7 +64,7 @@
           <string>;</string>
          </property>
          <property name="maxLength">
-          <number>1</number>
+          <number>3</number>
          </property>
         </widget>
        </item>

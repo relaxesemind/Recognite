@@ -21,8 +21,8 @@ InputModel Parser::inputModelFromFile(const QString &path, int id)
         return InputModel();
     }
 
-    QChar lineSeparator = StaticModel::shared().lineSeparator;
-    QChar numberSeparator = StaticModel::shared().numberSeparator;
+    QString lineSeparator = SettingsStorage::shared().lineSeparator;
+    QString numberSeparator = SettingsStorage::shared().numberSeparator;
 
     QStringList linesInFile = alltext.split(lineSeparator);
 
