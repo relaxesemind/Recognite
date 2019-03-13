@@ -30,24 +30,19 @@ public:
 
         }
         std::pair<int,int> getMaxMinFrequencies() const;
-        int getAccumulateFreq(bool force = true);
-
-public slots:
-        void addDestPair(const QString &path, const QImage &image);
+        void dropModel();
 
 public:
-    float absoluteMAXheight;
-    float absoluteMINheight;
-    QVector<int> frequencies;
-    QVector<std::pair<QString,QImage>> sources, dests;
-    QVector<InputModel> inputModels;
+    float absoluteMAXheight; // по абсолютно всем моделям
+    float absoluteMINheight; // по абсолютно всем моделям
+
+    QMap<QString, QVector<int>> frequencies; // частоты для диаграмм (ключ - путь к папке серии)
+    QMap<QString,QImage> sources, dests; // сурсы и десты для всего ключ - путь к txt
+    QVector<InputModel> inputModels; // после парса из txt
     QMap <
          QString,
          QVector<Area>
-         > objectsMap;
-
-private:
-    int sumFreq;
+         > objectsMap; // Объекты соответствуют единственной модели
 };
 
 #endif // STATICMODEL_H

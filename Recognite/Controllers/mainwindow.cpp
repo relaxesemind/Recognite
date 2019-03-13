@@ -34,29 +34,29 @@ void MainWindow::updateProcessPercentage(int value)
     if (value == 100)
     {
         bar->setValue(0);
-        QList<QTableWidgetItem *> list = ui->tableWidget->selectedItems();
-        if (list.isEmpty())
-        {
-            return;
-        }
+//        QList<QTableWidgetItem *> list = ui->tableWidget->selectedItems();
+//        if (list.isEmpty())
+//        {
+//            return;
+//        }
 
-        int id = list.first()->column();
-        if (id < 0 or id > dests.count() - 1)
-        {
-            return;
-        }
+//        int id = list.first()->column();
+//        if (id < 0 or id > dests.count() - 1)
+//        {
+//            return;
+//        }
 
-        if (modeFlag == true)
-        {
-            if (currentImageId < dests.count() - 1 and currentImageId >= 0)
-            {
-                ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(currentImageId).second));
-            }
-        }
-        else
-        {
-            ui->imageViewSelected->setImage(QPixmap::fromImage(dests[id].second));
-        }
+//        if (modeFlag == true)
+//        {
+//            if (currentImageId < dests.count() - 1 and currentImageId >= 0)
+//            {
+//                ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(currentImageId).second));
+//            }
+//        }
+//        else
+//        {
+//            ui->imageViewSelected->setImage(QPixmap::fromImage(dests[id].second));
+//        }
 
     }
     else
@@ -79,11 +79,10 @@ void MainWindow::makeImageFromFilePath(const QString &path)
 {
     QImage image = Core::shared().imageFromTxtFile(path);
     auto& sources = StaticModel::shared().sources;
-    auto pair = std::make_pair(path,image);
 
-    if (std::find(sources.begin(),sources.end(), pair) == sources.end())
+    if (std::find(sources.begin(),sources.end(), image) == sources.end())
     {
-        sources.append(std::make_pair(path,image));
+        sources.insert(path,image);
     }
 }
 
@@ -94,40 +93,6 @@ void MainWindow::setupListWidget()
     ui->imageView->addGradientAxis(0,0);
 
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
-
-//    listWidget->addItems(QStringList
-//    {
-//     "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
-//   });
-//    listWidget->addItems(QStringList{
-//                            "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_1.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_2.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_3.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_4.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_5.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_6.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_7.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_8.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_9.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_10.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_11.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_12.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_13.txt",
-//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)/310119-1_1F Height_14.txt"
-//                         });
 }
 
 void MainWindow::setupImageView()
@@ -142,25 +107,32 @@ void MainWindow::setupImageView()
             return ;
         }
 
-        QString path = sources.at(currentImageId).first;
-        auto& models = StaticModel::shared().inputModels;
-        for (InputModel& model : models)
-        {
-            if (model.path == path and model.isSafelyIndexes(coord.x(),coord.y()))
-            {
+//        QString path = sources.at(currentImageId).first;
+//        auto& models = StaticModel::shared().inputModels;
+//        for (InputModel& model : models)
+//        {
+//            if (model.path == path and model.isSafelyIndexes(coord.x(),coord.y()))
+//            {
 
-                QToolTip::showText(globalPos,QString::number(model.matrix[coord.y()][coord.x()],'f',2));
-                break;
-            }
-        }
+//                QToolTip::showText(globalPos,QString::number(model.matrix[coord.y()][coord.x()],'f',2));
+//                break;
+//            }
+//        }
     });
 }
 
 void MainWindow::on_loadTxtFiles_triggered()
 {
-    QStringList files = QFileDialog::getOpenFileNames(this,"Открыть файл","","*.txt *.all");
-    qDebug() << files;
-    ui->listWidget->addItems(files);
+    QString path = QFileDialog::getExistingDirectory(this, tr("Выберите папку с серией изображений"),
+                                                 "/home",
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+    if (path.isEmpty())
+    {
+        return;
+    }
+
+    ui->listWidget->addItem(path);
 }
 
 void MainWindow::on_maxHeightSlider_valueChanged(int value)
@@ -229,17 +201,41 @@ void MainWindow::on_minHeightLineEdit_textEdited(const QString &arg1)
 void MainWindow::on_pushButton_clicked()//build images
 {   
     QListWidget *listWidget = ui->listWidget;
-    auto& dests = StaticModel::shared().dests;
     auto& sources = StaticModel::shared().sources;
 
     for (int i = 0; i < listWidget->count(); ++i)
     {
-        this->makeImageFromFilePath(listWidget->item(i)->text());
+           QString path = listWidget->item(i)->text();
+           QStringList filePaths;
+
+           QDir folder(path);
+           folder.setFilter(QDir::Files);
+           folder.setSorting(QDir::Name);
+
+           QFileInfoList folderitems(folder.entryInfoList());
+
+               foreach (QFileInfo i_file, folderitems)
+               {
+                   QString i_filename(i_file.fileName());
+                   if (i_filename == "." || i_filename == ".." || i_filename.isEmpty())
+                   {
+                       continue;
+                   }
+
+                   filePaths << i_file.absoluteFilePath();
+               }
+           qDebug() << filePaths;
+
+           foreach (QString path, filePaths)
+           {
+               this->makeImageFromFilePath(path);
+           }
     }
+
 
     if (!sources.isEmpty())
     {
-        ui->imageView->setImage(QPixmap::fromImage(sources.at(0).second));
+        ui->imageView->setImage(QPixmap::fromImage(sources.first()));
         currentImageId = 0;
     }
 
@@ -390,8 +386,16 @@ void MainWindow::showListMenuAtPos(QPoint pos)
 
     connect(addItemAction,&QAction::triggered,this,[&listWidget,this]
     {
-        QStringList files = QFileDialog::getOpenFileNames(this,"Открыть файл","","*.txt *.all");
-        listWidget->addItems(files);
+        QString path = QFileDialog::getExistingDirectory(this, tr("Выберите папку с серией изображений"),
+                                                     "/home",
+                                                     QFileDialog::ShowDirsOnly
+                                                     | QFileDialog::DontResolveSymlinks);
+        if (path.isEmpty())
+        {
+            return;
+        }
+
+        ui->listWidget->addItem(path);
     });
 
     QAction *removeAction = new QAction(QString("Удалить файл"),this);
@@ -413,9 +417,7 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         tableWidget->setColumnCount(0);
         imageView->setImage(QPixmap());
         destView->setImage(QPixmap());
-        StaticModel::shared().sources.clear();
-        StaticModel::shared().dests.clear();
-
+        StaticModel::shared().dropModel();
     });
 ///
     menu.addActions(QList<QAction *>{removeAction, addItemAction,removeAll});
@@ -427,18 +429,6 @@ void MainWindow::on_changeShowMode_triggered()
     modeFlag = !modeFlag;
     ImageViewMode mode;
     auto& dests = StaticModel::shared().dests;
-
-//    if (mode == ImageViewMode::sourceAndDestsView)
-//    {
-//        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
-//        ui->imageViewSelected->setImage(QPixmap::fromImage(dests.at(id).second));
-//    }
-
-//    if (mode == ImageViewMode::transparentOver)
-//    {
-//        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
-//        ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(id).second));
-//    }
 
     if (modeFlag == true)
     {

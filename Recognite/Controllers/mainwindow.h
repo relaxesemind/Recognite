@@ -26,6 +26,8 @@
 #include <QCursor>
 #include <QDesktopWidget>
 #include <QToolTip>
+#include <QDir>
+#include <QFileInfo>
 
 
 

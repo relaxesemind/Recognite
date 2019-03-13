@@ -39,41 +39,6 @@ RC_ICONS = $${_PRO_FILE_PWD_}/resources/icon1.ico
 #-lopencv_objdetect341 -lopencv_flann341 -lopencv_videoio341
 
 
-SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    core.cpp \
-    Models/area.cpp \
-    Managers/parser.cpp \
-    grapher.cpp \
-    diagramwindow.cpp \
-    Models/inputmodel.cpp \
-    imageview.cpp \
-    selectingprocessmanager.cpp \
-    staticmodel.cpp \
-    gradientaxis.cpp \
-    parsersettingsdialog.cpp \
-    traversewalksettings.cpp \
-    Common/settingsstorage.cpp
-
-HEADERS += \
-        mainwindow.h \
-    Common/magic.h \
-    core.h \
-    Models/area.h \
-    Managers/parser.h \
-    grapher.h \
-    diagramwindow.h \
-    Models/inputmodel.h \
-    imageview.h \
-    Models/models.h \
-    selectingprocessmanager.h \
-    Common/consts.h \
-    staticmodel.h \
-    gradientaxis.h \
-    parsersettingsdialog.h \
-    traversewalksettings.h \
-    Common/settingsstorage.h
 
 FORMS += \
         mainwindow.ui \
@@ -83,3 +48,43 @@ FORMS += \
 
 RESOURCES += \
     resources/resources.qrc
+
+HEADERS += \
+    Common/consts.h \
+    Common/currentappstate.h \
+    Common/magic.h \
+    Common/settingsstorage.h \
+    Controllers/diagramwindow.h \
+    Controllers/mainwindow.h \
+    Controllers/parsersettingsdialog.h \
+    Controllers/traversewalksettings.h \
+    Managers/parser.h \
+    Models/area.h \
+    Models/inputmodel.h \
+    Models/models.h \
+    Views/GradientAxis/gradientaxis.h \
+    Views/ImageView/imageview.h \
+    Views/ImageView/imageviewmode.h \
+    core.h \
+    grapher.h \
+    selectingprocessmanager.h \
+    staticmodel.h \
+    Managers/selectingprocessmanager.h
+
+SOURCES += \
+    Common/currentappstate.cpp \
+    Common/settingsstorage.cpp \
+    Controllers/diagramwindow.cpp \
+    Controllers/mainwindow.cpp \
+    Controllers/parsersettingsdialog.cpp \
+    Controllers/traversewalksettings.cpp \
+    Managers/parser.cpp \
+    Models/area.cpp \
+    Models/inputmodel.cpp \
+    Views/GradientAxis/gradientaxis.cpp \
+    Views/ImageView/imageview.cpp \
+    core.cpp \
+    grapher.cpp \
+    main.cpp \
+    staticmodel.cpp \
+    Managers/selectingprocessmanager.cpp

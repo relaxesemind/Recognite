@@ -7,22 +7,23 @@ void StaticModel::init()
 
 std::pair<int, int> StaticModel::getMaxMinFrequencies() const
 {
-    int max = *std::max_element(frequencies.begin(),frequencies.end());
-    int min = *std::min_element(frequencies.begin(),frequencies.end());
+    int max = std::numeric_limits<int>::min();
+    int min = std::numeric_limits<int>::max();
+
+    std::for_each(frequencies.begin(),frequencies.end(),[&min,&max](QVector<int>& f)
+    {
+        max = *std::max_element(f.begin(),f.end());
+        min = *std::min_element(f.begin(),f.end());
+    });
+
     return std::make_pair(max,min);
 }
 
-int StaticModel::getAccumulateFreq(bool force)
+void StaticModel::dropModel()
 {
-    if (force or sumFreq == 0)
-    {
-        sumFreq = std::accumulate(frequencies.begin(),frequencies.end(),0);
-    }
-
-    return sumFreq;
-}
-
-void StaticModel::addDestPair(const QString &path, const QImage &image)
-{
-     dests.append(std::make_pair(path,image));
+    frequencies.clear();
+    sources.clear();
+    dests.clear();
+    inputModels.clear();
+    objectsMap.clear();
 }
