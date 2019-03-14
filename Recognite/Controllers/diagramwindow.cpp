@@ -46,11 +46,11 @@ void DiagramWindow::on_pushButton_clicked()//recalc
 
 void DiagramWindow::drawGraph()
 {
-//    Grapher::shared().clearView();
-//    pointsForGraph = Core::shared().calcPointsForGraph();
-//    float max = StaticModel::shared().absoluteMAXheight;
-//    float min = StaticModel::shared().absoluteMINheight;
-//    auto pair = StaticModel::shared().getMaxMinFrequencies();
+    Grapher::shared().clearView();
+    pointsForGraph = Core::shared().calcPointsForGraph();
+    float max = StaticModel::shared().absoluteMAXheight;
+    float min = StaticModel::shared().absoluteMINheight;
+    auto pair = StaticModel::shared().getMaxMinFrequencies();
 //    int sum = StaticModel::shared().getAccumulateFreq();
 
 //    int yMin = pair.second;
@@ -67,29 +67,29 @@ void DiagramWindow::drawGraph()
 
 void DiagramWindow::writeDataToStream(QTextStream& out)
 {
-    quint32 numberOfAreas = 0;
-    int value = ui->horizontalSlider->value();
-    float fValue = static_cast<float>(value) / 100;
-    float max = StaticModel::shared().absoluteMAXheight;
-    float min = StaticModel::shared().absoluteMINheight;
-    auto& objectsMap = StaticModel::shared().objectsMap;
+//    quint32 numberOfAreas = 0;
+//    int value = ui->horizontalSlider->value();
+//    float fValue = static_cast<float>(value) / 100;
+//    float max = StaticModel::shared().absoluteMAXheight;
+//    float min = StaticModel::shared().absoluteMINheight;
+//    auto& objectsMap = StaticModel::shared().objectsMap;
 
-    std::for_each(objectsMap.begin(),objectsMap.end(),[&numberOfAreas](QVector<Area>& vector){
-        numberOfAreas += vector.size();
-    });
+//    std::for_each(objectsMap.begin(),objectsMap.end(),[&numberOfAreas](QVector<Area>& vector){
+//        numberOfAreas += vector.size();
+//    });
 
-    out << QString("Всего объектов : ").toUtf8() << QString::number(numberOfAreas) << "\n";
-    out << QString("Абсолютный максимум : ").toUtf8() << QString::number(max,'f',1) << QString("нм").toUtf8()
-        << QString(" Абсолютный минимум : ").toUtf8() << QString::number(min,'f',1) << QString("нм").toUtf8() << "\n";
-//    out << QString("Количество карманов : ").toUtf8() << numOfColumnsText << QString(" Интервал между карманами : ").toUtf8()
-//        << QString::number((max - min) / (float)numOfColumns,'f',2) << QString("нм.").toUtf8() << "\n";
-    out << QString("Размер кармана : ").toUtf8() << QString::number(fValue,'f',2) << QString("нм").toUtf8() << "\n";
+//    out << QString("Всего объектов : ").toUtf8() << QString::number(numberOfAreas) << "\n";
+//    out << QString("Абсолютный максимум : ").toUtf8() << QString::number(max,'f',1) << QString("нм").toUtf8()
+//        << QString(" Абсолютный минимум : ").toUtf8() << QString::number(min,'f',1) << QString("нм").toUtf8() << "\n";
+////    out << QString("Количество карманов : ").toUtf8() << numOfColumnsText << QString(" Интервал между карманами : ").toUtf8()
+////        << QString::number((max - min) / (float)numOfColumns,'f',2) << QString("нм.").toUtf8() << "\n";
+//    out << QString("Размер кармана : ").toUtf8() << QString::number(fValue,'f',2) << QString("нм").toUtf8() << "\n";
 
-    for (int i = 0; i < pointsForGraph.count(); ++i)
-    {
-        out << QString::number(min + i*fValue,'f',2) << " " << QString::number(pointsForGraph[i].y()) << "\n";
+//    for (int i = 0; i < pointsForGraph.count(); ++i)
+//    {
+//        out << QString::number(min + i*fValue,'f',2) << " " << QString::number(pointsForGraph[i].y()) << "\n";
 
-    }
+//    }
 }
 
 QString generateFilePath()

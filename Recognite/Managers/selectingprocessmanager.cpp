@@ -29,4 +29,5 @@ void SelectingProcessManager::run()
 
     emit setEnableDiagram(!StaticModel::shared().objectsMap.isEmpty());
     emit isRunning(false);
+    emit isDone();
 }

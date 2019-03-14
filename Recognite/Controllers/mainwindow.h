@@ -79,6 +79,8 @@ private slots:
 
     void on_listWidget_itemClicked(QListWidgetItem *item);
 
+    void selectingTaskIsFinished();
+
 private:
     void updateTableWidget();
     void updateViewWithSeria();

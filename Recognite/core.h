@@ -38,7 +38,7 @@ public:
     std::pair<float,float> findAbsoluteMaxMinHeights();
     void calculateFrequencies(const QString& seriaPath, int numOfColumn);
     void calculateFrequenciesWithInterval(const QString& seriaPath, float interval);
-    QVector<QPointF> calcPointsForGraph(const QString& seriaPath);
+    QMap<QString,QVector<QPointF>> calcPointsForGraph();
     void setMinObjectSize(int value);
     void getTrueHeights(const InputModel &model, QVector<Area>& objects);
 

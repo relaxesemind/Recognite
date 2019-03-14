@@ -47,7 +47,7 @@ private:
     Ui::DiagramWindow *ui;
     void drawGraph();
     void writeDataToStream(QTextStream &out);
-    QVector<QPointF> pointsForGraph;
+    QMap<QString, QVector<QPointF>> pointsForGraph;
     GrapherMode::Options mode;
 };
 

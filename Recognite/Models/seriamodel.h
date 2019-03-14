@@ -15,7 +15,7 @@ public:
     SeriaModel() = default;
     SeriaModel(const QString& folder);
     SeriaModel(SeriaModel const&);
-    SeriaModel &operator=(SeriaModel const& rvalue);
+    SeriaModel &operator=(SeriaModel const&);
 
     void setFolderPath(const QString &value);
 

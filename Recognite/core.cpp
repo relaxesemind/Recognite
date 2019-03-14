@@ -129,22 +129,24 @@ void Core::calculateFrequenciesWithInterval(const QString &seriaPath, float inte
     this->calculateFrequencies(seriaPath,columns);
 }
 
-QVector<QPointF> Core::calcPointsForGraph(const QString &seriaPath)
+QMap<QString, QVector<QPointF>> Core::calcPointsForGraph()
 {
-    auto it = StaticModel::shared().frequencies.find(seriaPath);
-    if (it == StaticModel::shared().frequencies.end())
+    QMap<QString, QVector<QPointF>> map;
+    auto & freqM = StaticModel::shared().frequencies;
+
+    for (auto it = freqM.begin(); it != freqM.end(); ++it)
     {
-        return QVector<QPointF>();
+        auto data = it.value();
+        QVector<QPointF> points(data.size());
+
+        for (int i : data)
+        {
+            points[i] = QPointF(i,data[i]);
+        }
+        map.insert(it.key(),points);
     }
 
-    auto& frequencies = *it;
-    QVector<QPointF> result(frequencies.size());
-
-    repeat(i,frequencies.size())
-    {
-        result[i] = QPointF(i,frequencies[i]);
-    }
-    return result;
+    return map;
 }
 
 void Core::setMinObjectSize(int value)

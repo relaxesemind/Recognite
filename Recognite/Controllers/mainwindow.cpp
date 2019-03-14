@@ -23,18 +23,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateProcessPercentage(int value)
 {
-    QProgressBar *bar = ui->progressBar;
-    auto& dests = StaticModel::shared().dests;
-
-    if (value == 100)
-    {
-        bar->setValue(0);
-
-    }
-    else
-    {
-        bar->setValue(value);
-    }
+    ui->progressBar->setValue(value == 100 ? 0 : value);
 }
 
 void MainWindow::enableDiagramButton(bool flag)
@@ -59,6 +48,15 @@ void MainWindow::setupListWidget()
     listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->imageView->addGradientAxis(0,0);
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
+
+    listWidget->addItems(QStringList{
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)",
+                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)"
+                         });
+    SeriaModel s1("/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)"),
+               s2("/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)");
+    StaticModel::shared().series.append({s1,s2});
+    CurrentAppState::shared().currentSeria = s1;
 }
 
 void MainWindow::setupImageView()
@@ -94,6 +92,8 @@ void MainWindow::on_loadTxtFiles_triggered()
     }
 
     ui->listWidget->addItem(path);
+
+    qDebug() << path;
 
     SeriaModel seria(path);
     CurrentAppState::shared().currentSeria = seria;
@@ -240,7 +240,7 @@ void MainWindow::updateTableWidget()
     QVector<QString> files = seria.getFiles();
 
     table->clear();
-    table->setColumnCount(sources.count());
+    table->setColumnCount(files.count());
     table->setRowCount(1);
     const int imgSize = Consts::previewSourceImageHeight;
 
@@ -269,7 +269,6 @@ void MainWindow::updateViewWithSeria()
 
 void MainWindow::updateImageViews()
 {
-    auto& source = StaticModel::shared().sources;
     QImage sourceImage = StaticModel::shared().getCurrentImage();
     QImage binImage = StaticModel::shared().getCurrentBinImage();
 
@@ -328,7 +327,14 @@ void MainWindow::on_processPushButton_clicked()
     Core::shared().setRange(static_cast<float>(min) / 10.f,static_cast<float>(max) / 10.f);
     Core::shared().setMinObjectSize(minObjSize);
 
-    auto files = CurrentAppState::shared().currentSeria.getFiles();
+    QVector<QString> files;
+    auto& series = StaticModel::shared().series;
+
+    std::for_each(series.begin(),series.end(),[&files](SeriaModel const& seria)
+    {
+        files.append(seria.getFiles());
+    });
+
     QStringList paths(files.toList());
 
     if (paths.isEmpty())
@@ -342,19 +348,24 @@ void MainWindow::on_processPushButton_clicked()
     connect(selectingTask,&SelectingProcessManager::destPair,&StaticModel::shared(),&StaticModel::addDestPair);
     connect(selectingTask,&SelectingProcessManager::setEnableDiagram,this,&MainWindow::enableDiagramButton);
     connect(selectingTask,&SelectingProcessManager::processPercent,this,&MainWindow::updateProcessPercentage);
+    connect(selectingTask,&SelectingProcessManager::isDone,this,&MainWindow::selectingTaskIsFinished);
     connect(selectingTask,&SelectingProcessManager::isRunning,this,[](bool isRunning){
         CurrentAppState::shared().selectingTaskIsRunning = isRunning;
     });
 
     pool->start(selectingTask);
-    updateTableWidget();
 }
 
 
 void MainWindow::on_diagramPushButton_clicked()
 {
     Grapher::shared().clearView();
-    Core::shared().calculateFrequenciesWithInterval(CurrentAppState::shared().currentSeria.getFolderPath(),0.3f);
+    auto& series = StaticModel::shared().series;
+
+    std::for_each(series.begin(),series.end(),[](SeriaModel const& seria){
+        Core::shared().calculateFrequenciesWithInterval(seria.getFolderPath(),Consts::defaultFrequencyInterval);
+    });
+
     (new DiagramWindow(this))->show();
 }
 
@@ -381,7 +392,7 @@ void MainWindow::showListMenuAtPos(QPoint pos)
             return;
         }
 
-        ui->listWidget->addItem(path);
+        listWidget->addItem(path);
         SeriaModel seria(path);
         CurrentAppState::shared().currentSeria = seria;
         StaticModel::shared().series.append(seria);
@@ -453,6 +464,11 @@ void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
             updateViewWithSeria();
         }
     }
+}
+
+void MainWindow::selectingTaskIsFinished()
+{
+    updateViewWithSeria();
 }
 
 
