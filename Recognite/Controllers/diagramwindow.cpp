@@ -15,6 +15,7 @@ DiagramWindow::DiagramWindow(QWidget *parent) :
     ui->horizontalSlider->setMaximum(150);
     ui->horizontalSlider->setValue(30);
     ui->lineEdit->setText("0.30нм");
+
     drawGraph();
     ui->gridLayout->addWidget(Grapher::shared().view,1,0);
 }
@@ -51,18 +52,20 @@ void DiagramWindow::drawGraph()
     float max = StaticModel::shared().absoluteMAXheight;
     float min = StaticModel::shared().absoluteMINheight;
     auto pair = StaticModel::shared().getMaxMinFrequencies();
-//    int sum = StaticModel::shared().getAccumulateFreq();
+    ColorGenerator<> gena;
 
-//    int yMin = pair.second;
-//    int yMax = pair.first;
 
-//    qDebug() << "sum = " << sum;
-//    qDebug() << "ymin = " << yMin << " yMax = " << yMax;
+    int yMin = pair.second;
+    int yMax = pair.first;
 
-//    Grapher::shared().setXRange(min,max);
-//    Grapher::shared().setYRange(static_cast<float>(yMin)/static_cast<float>(sum),
-//                                static_cast<float>(yMax)/static_cast<float>(sum));
-//    Grapher::shared().addPointsAtGraph(pointsForGraph,mode);
+    Grapher::shared().setXRange(min,max);
+    Grapher::shared().setYRange(0,1);
+    Grapher::shared().updateState();
+
+    std::for_each(pointsForGraph.begin(),pointsForGraph.end(),[this,&gena](QVector<QPointF> const& points)
+    {
+        Grapher::shared().addGraph(points,mode,gena.get(),gena.get());
+    });
 }
 
 void DiagramWindow::writeDataToStream(QTextStream& out)

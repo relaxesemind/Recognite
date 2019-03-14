@@ -70,7 +70,8 @@ HEADERS += \
     selectingprocessmanager.h \
     staticmodel.h \
     Managers/selectingprocessmanager.h \
-    Models/seriamodel.h
+    Models/seriamodel.h \
+    Common/colorgenerator.h
 
 SOURCES += \
     Common/currentappstate.cpp \
@@ -89,4 +90,5 @@ SOURCES += \
     main.cpp \
     staticmodel.cpp \
     Managers/selectingprocessmanager.cpp \
-    Models/seriamodel.cpp
+    Models/seriamodel.cpp \
+    Common/colorgenerator.cpp

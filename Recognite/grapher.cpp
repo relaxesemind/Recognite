@@ -9,15 +9,10 @@ Grapher::Grapher()
     view->setRenderHint(QPainter::Antialiasing);
     view->setRubberBand(QChartView::RectangleRubberBand);
 
-//    rubberBand = view->findChild<QRubberBand *>();
-//    if (rubberBand)
-//    {
-//        rubberBand->installEventFilter(this);
-//        connect(this,&Grapher::rubberBandChanged,this,&Grapher::rubberZoomAdapt);
-//    }
+    updateState();
 }
 
-void Grapher::addPointsAtGraph(const QVector<QPointF>& points, GrapherMode::Options mode)
+void Grapher::updateState()
 {
     chart->legend()->hide();
     QFont font;
@@ -43,7 +38,10 @@ void Grapher::addPointsAtGraph(const QVector<QPointF>& points, GrapherMode::Opti
 
     chart->setAxisX(axisX);
     chart->setAxisY(axisY);
+}
 
+void Grapher::addGraph(const QVector<QPointF> &points, GrapherMode::Options mode, QColor barColor, QColor lineColor)
+{
     if (mode & GrapherMode::BarVisible)
     {
         QBarSeries *series = new QBarSeries();
@@ -54,7 +52,7 @@ void Grapher::addPointsAtGraph(const QVector<QPointF>& points, GrapherMode::Opti
             barSet->append(p.y());
         }
 
-        barSet->setColor(QColor("orange"));
+        barSet->setColor(barColor);
         series->insert(0,barSet);
         chart->addSeries(series);
     }
@@ -67,9 +65,7 @@ void Grapher::addPointsAtGraph(const QVector<QPointF>& points, GrapherMode::Opti
             seriesLine->append(p);
         }
 
-        QColor color;
-        color.setNamedColor("red");
-        QPen pen(color);
+        QPen pen(lineColor);
         pen.setWidthF(2.5);
 
         seriesLine->setPen(pen);

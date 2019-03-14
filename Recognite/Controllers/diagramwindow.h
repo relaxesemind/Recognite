@@ -14,6 +14,7 @@
 #include "staticmodel.h"
 #include "Common/magic.h"
 #include "Common/currentappstate.h"
+#include "Common/colorgenerator.h"
 
 
 namespace Ui {

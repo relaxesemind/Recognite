@@ -78,7 +78,7 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
     if (it == StaticModel::shared().frequencies.end())
     {
-        return;
+        it = StaticModel::shared().frequencies.insert(seriaPath,{});
     }
 
     auto& frequencies = *it;
@@ -139,7 +139,7 @@ QMap<QString, QVector<QPointF>> Core::calcPointsForGraph()
         auto data = it.value();
         QVector<QPointF> points(data.size());
 
-        for (int i : data)
+        repeat(i,data.size())
         {
             points[i] = QPointF(i,data[i]);
         }

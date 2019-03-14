@@ -56,7 +56,8 @@ public:
     QChart *chart;
 
 public:
-    void addPointsAtGraph(const QVector<QPointF>& points, GrapherMode::Options mode);
+    void updateState();
+    void addGraph(QVector<QPointF> const& points, GrapherMode::Options mode, QColor barColor = QColor(), QColor lineColor = QColor());
     void clearView();
     void setXRange(float min, float max);
     void setYRange(float min, float max);

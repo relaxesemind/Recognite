@@ -1,15 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    pool(new QThreadPool(this))
+    pool(new QThreadPool(this)),
+    selectingTask(nullptr)
 {
     ui->setupUi(this);
     ui->menuBar->setNativeMenuBar(false);
-    selectingTask = nullptr;
 
     setupListWidget();
     setupImageView();
@@ -49,6 +48,7 @@ void MainWindow::setupListWidget()
     ui->imageView->addGradientAxis(0,0);
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
 
+    //mock
     listWidget->addItems(QStringList{
                              "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)",
                              "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)"
@@ -61,22 +61,20 @@ void MainWindow::setupListWidget()
 
 void MainWindow::setupImageView()
 {
-    connect(ui->imageView,&ImageView::showHeightToolTip,this,[this](const QPoint& coord, const QPoint& globalPos)
+    connect(ui->imageView,&ImageView::showHeightToolTip,this,[](const QPoint& coord, const QPoint& globalPos)
     {
 
-        auto& sources = StaticModel::shared().sources;
+        auto& models = StaticModel::shared().inputModels;
+        QString path = CurrentAppState::shared().currentFilePath;
 
-//        QString path = sources.at(currentImageId).first;
-//        auto& models = StaticModel::shared().inputModels;
-//        for (InputModel& model : models)
-//        {
-//            if (model.path == path and model.isSafelyIndexes(coord.x(),coord.y()))
-//            {
-
-//                QToolTip::showText(globalPos,QString::number(model.matrix[coord.y()][coord.x()],'f',2));
-//                break;
-//            }
-//        }
+        for (InputModel& model : models)
+        {
+            if (model.path == path and model.isSafelyIndexes(coord.x(),coord.y()))
+            {
+                QToolTip::showText(globalPos,QString::number(model.matrix[coord.y()][coord.x()],'f',2));
+                break;
+            }
+        }
     });
 }
 
@@ -362,7 +360,8 @@ void MainWindow::on_diagramPushButton_clicked()
     Grapher::shared().clearView();
     auto& series = StaticModel::shared().series;
 
-    std::for_each(series.begin(),series.end(),[](SeriaModel const& seria){
+    std::for_each(series.begin(),series.end(),[](SeriaModel const& seria)
+    {
         Core::shared().calculateFrequenciesWithInterval(seria.getFolderPath(),Consts::defaultFrequencyInterval);
     });
 
