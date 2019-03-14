@@ -26,6 +26,7 @@ void StaticModel::dropModel()
     dests.clear();
     inputModels.clear();
     objectsMap.clear();
+    series.clear();
 }
 
 void StaticModel::addDestPair(const QString &path, const QImage &image)
@@ -33,50 +34,12 @@ void StaticModel::addDestPair(const QString &path, const QImage &image)
     dests.insert(path,image);
 }
 
-QStringList StaticModel::getAllFolderFiles(const QString& folderPath) const
-{
-    QStringList filePaths;
-    QDir folder(folderPath);
-
-    if (!folder.exists())
-    {
-        return QStringList{};
-    }
-
-    folder.setFilter(QDir::Files);
-    folder.setSorting(QDir::Name);
-
-    QFileInfoList folderitems(folder.entryInfoList());
-
-        foreach (QFileInfo i_file, folderitems)
-        {
-            QString i_filename(i_file.fileName());
-            if (i_filename == "." || i_filename == ".." || i_filename.isEmpty())
-            {
-                continue;
-            }
-
-            filePaths << i_file.absoluteFilePath();
-        }
-
-    return filePaths;
-}
-
-QStringList StaticModel::getAllFolderFiles(int index) const
-{
-    if (index >= 0 and index <= folders.count())
-    {
-        return getAllFolderFiles(folders[index]);
-    }
-    else
-    {
-        return QStringList{};
-    }
-}
 
 QVector<QImage> StaticModel::getCurrentSeriaImages() const
 {
-    QStringList files = CurrentAppState::shared().getCurrentSeriaFiles();
+    SeriaModel seria = CurrentAppState::shared().currentSeria;
+    QVector<QString> files = seria.getFiles();
+
     QVector<QImage> result;
 
     for (int i = 0; i < files.count(); i++)
@@ -94,7 +57,9 @@ QVector<QImage> StaticModel::getCurrentSeriaImages() const
 
 QVector<QImage> StaticModel::getCurrentSeriaBinImages() const
 {
-    QStringList files = CurrentAppState::shared().getCurrentSeriaFiles();
+    SeriaModel seria = CurrentAppState::shared().currentSeria;
+    QVector<QString> files = seria.getFiles();
+
     QVector<QImage> result;
 
     for (int i = 0; i < files.count(); i++)

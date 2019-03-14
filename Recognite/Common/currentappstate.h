@@ -6,13 +6,14 @@
 #include <QDir>
 #include <QFileInfo>
 #include "Views/ImageView/imageviewmode.h"
+#include "Models/seriamodel.h"
 
 
 class CurrentAppState
 {
 public:
-    CurrentAppState(CurrentAppState const&) = delete ;
-    CurrentAppState& operator=(CurrentAppState const&) = delete ;
+    CurrentAppState(CurrentAppState const&) = delete;
+    CurrentAppState& operator=(CurrentAppState const&) = delete;
     static CurrentAppState& shared()
     {
         static CurrentAppState instance;
@@ -24,11 +25,9 @@ private:
 
 public:
    QString currentFilePath; // отображаемый на ImageView
-   QString currentFolder; // текущая папка
+   SeriaModel currentSeria;
    bool selectingTaskIsRunning; // поток с выделением областей
    ImageViewMode imageViewMode;
-
-   QStringList getCurrentSeriaFiles() const;
 
 };
 

@@ -69,7 +69,8 @@ HEADERS += \
     grapher.h \
     selectingprocessmanager.h \
     staticmodel.h \
-    Managers/selectingprocessmanager.h
+    Managers/selectingprocessmanager.h \
+    Models/seriamodel.h
 
 SOURCES += \
     Common/currentappstate.cpp \
@@ -87,4 +88,5 @@ SOURCES += \
     grapher.cpp \
     main.cpp \
     staticmodel.cpp \
-    Managers/selectingprocessmanager.cpp
+    Managers/selectingprocessmanager.cpp \
+    Models/seriamodel.cpp

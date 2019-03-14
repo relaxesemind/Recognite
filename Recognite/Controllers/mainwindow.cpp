@@ -95,8 +95,9 @@ void MainWindow::on_loadTxtFiles_triggered()
 
     ui->listWidget->addItem(path);
 
-    StaticModel::shared().folders.append(path);
-    CurrentAppState::shared().currentFolder = path;
+    SeriaModel seria(path);
+    CurrentAppState::shared().currentSeria = seria;
+    StaticModel::shared().series.append(seria);
 }
 
 void MainWindow::on_maxHeightSlider_valueChanged(int value)
@@ -177,13 +178,22 @@ void MainWindow::on_pushButton_clicked()//build images
                continue;
            }
 
-           CurrentAppState::shared().currentFolder = path;
-           QStringList filePaths = CurrentAppState::shared().getCurrentSeriaFiles();
+           SeriaModel seria(path);
+           QVector<QString> filePaths = seria.getFiles();
 
            std::for_each(filePaths.begin(),filePaths.end(),[this](const QString& path)
            {
                this->makeImageFromFilePath(path);
            });
+    }
+
+    if (listWidget->count())
+    {
+        CurrentAppState::shared().currentSeria = SeriaModel(listWidget->item(0)->text());
+    }
+    else
+    {
+        return;
     }
 
     // inputModels and sources is ready
@@ -224,10 +234,10 @@ void MainWindow::on_pushButton_clicked()//build images
 void MainWindow::updateTableWidget()
 {
     QTableWidget *table = ui->tableWidget;
-    QString folder = CurrentAppState::shared().currentFolder;
+    SeriaModel seria = CurrentAppState::shared().currentSeria;
     auto& sources = StaticModel::shared().sources;
 
-    QStringList files = CurrentAppState::shared().getCurrentSeriaFiles();
+    QVector<QString> files = seria.getFiles();
 
     table->clear();
     table->setColumnCount(sources.count());
@@ -286,34 +296,12 @@ void MainWindow::updateImageViews()
 void MainWindow::on_tableWidget_clicked(const QModelIndex &index)
 {
     int id = index.column();
-    QVector<QImage> sources = StaticModel::shared().getCurrentSeriaImages();
-    QVector<QImage> dests = StaticModel::shared().getCurrentSeriaBinImages();
-
-//    if (id < 0 or id > sources.count() - 1)
-//    {
-//        return;
-//    }
-
-
-//    if (mode == ImageViewMode::sourceAndDestsView)
-//    {
-//        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
-//        if (id > dests.count() - 1)
-//        {
-//            return;
-//        }
-//        ui->imageViewSelected->setImage(QPixmap::fromImage(dests.at(id).second));
-//    }
-
-//    if (mode == ImageViewMode::transparentOver)
-//    {
-//        ui->imageView->setImage(QPixmap::fromImage(sources.at(id).second));
-//        if (id > dests.count() - 1)
-//        {
-//            return;
-//        }
-//        ui->imageView->setBinaryImage(QPixmap::fromImage(dests.at(id).second));
-//    }
+    auto files = CurrentAppState::shared().currentSeria.getFiles();
+    if (id >= 0 and id < files.count())
+    {
+        CurrentAppState::shared().currentFilePath = files[id];
+        updateImageViews();
+    }
 }
 
 void MainWindow::on_processPushButton_clicked()
@@ -340,7 +328,8 @@ void MainWindow::on_processPushButton_clicked()
     Core::shared().setRange(static_cast<float>(min) / 10.f,static_cast<float>(max) / 10.f);
     Core::shared().setMinObjectSize(minObjSize);
 
-    QStringList paths = CurrentAppState::shared().getCurrentSeriaFiles();
+    auto files = CurrentAppState::shared().currentSeria.getFiles();
+    QStringList paths(files.toList());
 
     if (paths.isEmpty())
     {
@@ -365,7 +354,7 @@ void MainWindow::on_processPushButton_clicked()
 void MainWindow::on_diagramPushButton_clicked()
 {
     Grapher::shared().clearView();
-    Core::shared().calculateFrequenciesWithInterval(CurrentAppState::shared().currentFolder,0.3f);
+    Core::shared().calculateFrequenciesWithInterval(CurrentAppState::shared().currentSeria.getFolderPath(),0.3f);
     (new DiagramWindow(this))->show();
 }
 
@@ -393,6 +382,9 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         }
 
         ui->listWidget->addItem(path);
+        SeriaModel seria(path);
+        CurrentAppState::shared().currentSeria = seria;
+        StaticModel::shared().series.append(seria);
     });
 
     QAction *removeAction = new QAction(QString("Удалить файл"),this);
@@ -451,9 +443,15 @@ void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
     QString folderPath = item->text();
     if (!folderPath.isEmpty())
     {
-        CurrentAppState::shared().currentFolder = folderPath;
-        CurrentAppState::shared().currentFilePath = CurrentAppState::shared().getCurrentSeriaFiles().first();
-        updateViewWithSeria();
+        SeriaModel seria(folderPath);
+        CurrentAppState::shared().currentSeria = seria;
+        auto files = seria.getFiles();
+
+        if (!files.isEmpty())
+        {
+            CurrentAppState::shared().currentFilePath = files.first();
+            updateViewWithSeria();
+        }
     }
 }
 
