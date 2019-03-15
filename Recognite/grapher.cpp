@@ -24,11 +24,11 @@ void Grapher::updateState()
     QValueAxis *axisX = new QValueAxis();
     QValueAxis *axisY = new QValueAxis();
 
-    axisY->setMax(maxY * 100 /  0.95);
-    axisY->setMin(minY * 100 /  0.95);
+    axisY->setMax(maxY * 100);
+    axisY->setMin(minY * 100);
 
-    axisX->setMin(minX /  0.95);
-    axisX->setMax(maxX / 0.95);
+    axisX->setMin(minX);
+    axisX->setMax(maxX);
 
     axisX->setLabelFormat("%.1f nm");
     axisY->setLabelFormat("%.1f%%");
@@ -44,7 +44,7 @@ void Grapher::updateState()
 void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, GrapherMode::Options mode, QColor barColor, QColor lineColor)
 {
     chart->legend()->show();
-    chart->legend()->setAlignment(Qt::AlignBottom);
+    chart->legend()->setAlignment(Qt::AlignRight);
 
     if (mode & GrapherMode::BarVisible)
     {
