@@ -38,7 +38,8 @@ public:
 
     QColor get()
     {
-        return this->operator QColor();
+        uint vl = dist(re);
+        return QColor(static_cast<QRgb>(vl));
     }
 
 private:

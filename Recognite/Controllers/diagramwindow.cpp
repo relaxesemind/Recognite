@@ -7,7 +7,7 @@ DiagramWindow::DiagramWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->menubar->setNativeMenuBar(false);
-    mode = GrapherMode::BarVisible | GrapherMode::SplineVisible;
+    mode = GrapherMode::SplineVisible;
 
     //min = 0.02 nm  max = 2 nm x 100
 
@@ -15,6 +15,14 @@ DiagramWindow::DiagramWindow(QWidget *parent) :
     ui->horizontalSlider->setMaximum(150);
     ui->horizontalSlider->setValue(30);
     ui->lineEdit->setText("0.30нм");
+
+    auto & series = StaticModel::shared().series;
+
+    std::for_each(series.begin(),series.end(),[this](SeriaModel& seria)
+    {
+       barColors.insert(seria.getFolderPath(),gena.get());
+       splineColors.insert(seria.getFolderPath(),gena.get());
+    });
 
     drawGraph();
     ui->gridLayout->addWidget(Grapher::shared().view,1,0);
@@ -38,10 +46,15 @@ void DiagramWindow::on_lineEdit_editingFinished()
 
 void DiagramWindow::on_pushButton_clicked()//recalc
 {
-//    QString text = ui->lineEdit->text();
     int value = ui->horizontalSlider->value();
     float fValue = static_cast<float>(value) / 100;
-//    Core::shared().calculateFrequenciesWithInterval(CurrentAppState::shared().currentFolder, fValue);
+
+    auto& series = StaticModel::shared().series;
+    std::for_each(series.begin(),series.end(),[fValue](SeriaModel const& seria)
+    {
+        Core::shared().calculateFrequenciesWithInterval(seria.getFolderPath(),fValue);
+    });
+
     drawGraph();
 }
 
@@ -52,20 +65,30 @@ void DiagramWindow::drawGraph()
     float max = StaticModel::shared().absoluteMAXheight;
     float min = StaticModel::shared().absoluteMINheight;
     auto pair = StaticModel::shared().getMaxMinFrequencies();
-    ColorGenerator<> gena;
 
+    auto& freq = StaticModel::shared().frequencies;
 
     int yMin = pair.second;
     int yMax = pair.first;
+    int sum = 0;
+
+    std::for_each(freq.begin(),freq.end(),[&sum](QVector<int> const& f)
+    {
+        sum += std::accumulate(f.begin(),f.end(),0);
+    });
 
     Grapher::shared().setXRange(min,max);
-    Grapher::shared().setYRange(0,1);
+    Grapher::shared().setYRange(static_cast<float>(yMin) / sum,static_cast<float>(yMax) / sum);
     Grapher::shared().updateState();
 
-    std::for_each(pointsForGraph.begin(),pointsForGraph.end(),[this,&gena](QVector<QPointF> const& points)
+    for (auto it = pointsForGraph.begin(); it != pointsForGraph.end(); ++it)
     {
-        Grapher::shared().addGraph(points,mode,gena.get(),gena.get());
-    });
+        QStringList legendTitle = it.key().split(QDir::separator());
+        if (!legendTitle.isEmpty())
+        {
+            Grapher::shared().addGraph(it.value(),legendTitle.last(),mode,barColors[it.key()],splineColors[it.key()]);
+        }
+    }
 }
 
 void DiagramWindow::writeDataToStream(QTextStream& out)
@@ -151,3 +174,29 @@ void DiagramWindow::on_splineChecker_triggered()
     mode ^= GrapherMode::SplineVisible;
     drawGraph();
 }
+
+void DiagramWindow::on_action_8_triggered()//random colors
+{
+    auto & series = StaticModel::shared().series;
+
+    std::for_each(series.begin(),series.end(),[this](SeriaModel& seria)
+    {
+       barColors.insert(seria.getFolderPath(),gena.get());
+       splineColors.insert(seria.getFolderPath(),gena.get());
+    });
+    drawGraph();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

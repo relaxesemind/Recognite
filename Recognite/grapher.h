@@ -36,6 +36,13 @@ class ChartView : public QChartView
 {
 public:
     ChartView() = default;
+
+//protected:
+//    bool viewportEvent(QEvent *event);
+//    void mousePressEvent(QMouseEvent *event);
+//    void mouseMoveEvent(QMouseEvent *event);
+//    void mouseReleaseEvent(QMouseEvent *event);
+//    void keyPressEvent(QKeyEvent *event);
 };
 
 
@@ -57,7 +64,7 @@ public:
 
 public:
     void updateState();
-    void addGraph(QVector<QPointF> const& points, GrapherMode::Options mode, QColor barColor = QColor(), QColor lineColor = QColor());
+    void addGraph(QVector<QPointF> const& points, const QString &title, GrapherMode::Options mode, QColor barColor = QColor(), QColor lineColor = QColor());
     void clearView();
     void setXRange(float min, float max);
     void setYRange(float min, float max);

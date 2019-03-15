@@ -97,23 +97,29 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
     frequencies.clear();
     frequencies.resize(numOfColumn);
 
-    StaticModel::shared().foreachArea([&frequencies, min, max, singleInterval](Area& object)
+    SeriaModel seria(seriaPath);
+    QVector<QString> files = seria.getFiles();
+
+    for (QString const& file : files)
     {
-        float height = object.getMaxHeight().height;
-        int column = 0;
-
-        while(height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
+        auto objectsForFile = *objects.find(file);
+        std::for_each(objectsForFile.begin(),objectsForFile.end(),[&frequencies, min, max, singleInterval](Area& object)
         {
-            ++column;
-        }
+            float height = object.getMaxHeight().height;
+            int column = 0;
 
-        if (column < frequencies.size() - 1)
-        {
+            while(height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
+            {
+                ++column;
+            }
 
-           ++frequencies[column];
-        }
+            if (column < frequencies.size() - 1)
+            {
 
-    });
+               ++frequencies[column];
+            }
+        });
+    }
 }
 
 void Core::calculateFrequenciesWithInterval(const QString &seriaPath, float interval)

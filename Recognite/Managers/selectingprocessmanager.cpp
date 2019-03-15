@@ -1,6 +1,6 @@
 #include "selectingprocessmanager.h"
 
-SelectingProcessManager::SelectingProcessManager(const QStringList &paths) : paths(paths)
+SelectingProcessManager::SelectingProcessManager(QStringList &&paths) : paths(paths)
 {
 
 }

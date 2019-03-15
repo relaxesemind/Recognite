@@ -196,6 +196,9 @@ void MainWindow::on_pushButton_clicked()//build images
 
     // inputModels and sources is ready
 
+    qDebug() << "inputModels size = " << StaticModel::shared().inputModels.size();
+    qDebug() << "sources size = " << StaticModel::shared().sources.size();
+
     if (!sources.isEmpty())
     {
         auto firstIt = sources.begin();
@@ -341,7 +344,7 @@ void MainWindow::on_processPushButton_clicked()
     }
 
     dests.clear();
-    selectingTask = new SelectingProcessManager(paths);
+    selectingTask = new SelectingProcessManager(std::move(paths));
 
     connect(selectingTask,&SelectingProcessManager::destPair,&StaticModel::shared(),&StaticModel::addDestPair);
     connect(selectingTask,&SelectingProcessManager::setEnableDiagram,this,&MainWindow::enableDiagramButton);
@@ -419,7 +422,7 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         StaticModel::shared().dropModel();
     });
 
-    menu.addActions(QList<QAction *>{removeAction, addItemAction,removeAll});
+    menu.addActions({removeAction, addItemAction,removeAll});
     menu.exec(globalPos);
 }
 

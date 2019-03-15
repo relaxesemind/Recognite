@@ -16,7 +16,7 @@ class SelectingProcessManager : public QObject, public QRunnable
     Q_OBJECT
 
 public:
-    explicit SelectingProcessManager(const QStringList& paths);
+    explicit SelectingProcessManager(QStringList&& paths);
     ~SelectingProcessManager(){}
 
 protected:

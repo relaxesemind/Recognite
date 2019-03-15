@@ -1,6 +1,13 @@
 #ifndef DIAGRAMWINDOW_H
 #define DIAGRAMWINDOW_H
 
+#include "grapher.h"
+#include "core.h"
+#include "staticmodel.h"
+#include "Common/magic.h"
+#include "Common/currentappstate.h"
+#include "Common/colorgenerator.h"
+
 #include <QMainWindow>
 #include <QFile>
 #include <QDir>
@@ -9,12 +16,7 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QTextCodec>
-#include "grapher.h"
-#include "core.h"
-#include "staticmodel.h"
-#include "Common/magic.h"
-#include "Common/currentappstate.h"
-#include "Common/colorgenerator.h"
+#include <QColorDialog>
 
 
 namespace Ui {
@@ -44,12 +46,16 @@ private slots:
 
     void on_splineChecker_triggered();
 
+    void on_action_8_triggered();
+
 private:
     Ui::DiagramWindow *ui;
     void drawGraph();
     void writeDataToStream(QTextStream &out);
     QMap<QString, QVector<QPointF>> pointsForGraph;
     GrapherMode::Options mode;
+    ColorGenerator<> gena;
+    QMap<QString,QColor> barColors, splineColors;
 };
 
 #endif // DIAGRAMWINDOW_H
