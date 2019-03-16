@@ -49,7 +49,7 @@ void MainWindow::setupListWidget()
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
 
     //mock
-    listWidget->addItems(QStringList{
+    listWidget->addItems({
                              "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)",
                              "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)"
                          });
@@ -76,6 +76,78 @@ void MainWindow::setupImageView()
             }
         }
     });
+}
+
+void MainWindow::buildImages()
+{
+    QListWidget *listWidget = ui->listWidget;
+    auto& sources = StaticModel::shared().sources;
+    StaticModel::shared().inputModels.clear();
+    sources.clear();
+
+    for (int i = 0; i < listWidget->count(); ++i)
+    {
+           QString path = listWidget->item(i)->text();
+           QDir folder(path);
+
+           if (!folder.exists())
+           {
+               continue;
+           }
+
+           SeriaModel seria(path);
+           QVector<QString> filePaths = seria.getFiles();
+
+           std::for_each(filePaths.begin(),filePaths.end(),[this](const QString& path)
+           {
+               this->makeImageFromFilePath(path);
+           });
+    }
+
+    if (listWidget->count())
+    {
+        CurrentAppState::shared().currentSeria = SeriaModel(listWidget->item(0)->text());
+    }
+    else
+    {
+        return;
+    }
+
+    // inputModels and sources is ready
+
+    qDebug() << "inputModels size = " << StaticModel::shared().inputModels.size();
+    qDebug() << "sources size = " << StaticModel::shared().sources.size();
+
+    if (!sources.isEmpty())
+    {
+        auto firstIt = sources.begin();
+        ui->imageView->setImage(QPixmap::fromImage(firstIt.value()));
+        CurrentAppState::shared().currentFilePath = firstIt.key();
+    }
+    else
+    {
+        return;
+    }
+
+
+   this->updateTableWidget();
+
+   auto pair = Core::shared().findAbsoluteMaxMinHeights();
+   float maxNumber = pair.first;
+   float minNumber = pair.second;
+   QString max = QString::number(pair.first);
+   QString min = QString::number(pair.second);
+   int interval = static_cast<int>((maxNumber - minNumber) / 30);
+
+   ui->label_4->setText(QString("Абсолютный MAX = ") + max + QString("нм"));
+   ui->label_5->setText(QString("Абсолютный MIN = ") + min + QString("нм"));
+   ui->maxHeightSlider->setSingleStep(interval);
+   ui->maxHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
+   ui->maxHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
+   ui->minHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
+   ui->minHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
+   ui->maxHeightSlider->setValue(static_cast<int>(maxNumber * 10));
+   ui->minHeightSlider->setValue(static_cast<int>((maxNumber - minNumber) / 4) * 10);
 }
 
 void MainWindow::on_loadTxtFiles_triggered()
@@ -163,73 +235,7 @@ void MainWindow::on_minHeightLineEdit_textEdited(const QString &arg1)
 
 void MainWindow::on_pushButton_clicked()//build images
 {   
-    QListWidget *listWidget = ui->listWidget;
-    auto& sources = StaticModel::shared().sources;
-
-    for (int i = 0; i < listWidget->count(); ++i)
-    {
-           QString path = listWidget->item(i)->text();
-           QDir folder(path);
-
-           if (!folder.exists())
-           {
-               continue;
-           }
-
-           SeriaModel seria(path);
-           QVector<QString> filePaths = seria.getFiles();
-
-           std::for_each(filePaths.begin(),filePaths.end(),[this](const QString& path)
-           {
-               this->makeImageFromFilePath(path);
-           });
-    }
-
-    if (listWidget->count())
-    {
-        CurrentAppState::shared().currentSeria = SeriaModel(listWidget->item(0)->text());
-    }
-    else
-    {
-        return;
-    }
-
-    // inputModels and sources is ready
-
-    qDebug() << "inputModels size = " << StaticModel::shared().inputModels.size();
-    qDebug() << "sources size = " << StaticModel::shared().sources.size();
-
-    if (!sources.isEmpty())
-    {
-        auto firstIt = sources.begin();
-        ui->imageView->setImage(QPixmap::fromImage(firstIt.value()));
-        CurrentAppState::shared().currentFilePath = firstIt.key();
-    }
-    else
-    {
-        return;
-    }
-
-
-   this->updateTableWidget();
-
-   auto pair = Core::shared().findAbsoluteMaxMinHeights();
-   float maxNumber = pair.first;
-   float minNumber = pair.second;
-   QString max = QString::number(pair.first);
-   QString min = QString::number(pair.second);
-   int interval = static_cast<int>((maxNumber - minNumber) / 30);
-
-   ui->label_4->setText(QString("Абсолютный MAX = ") + max + QString("нм"));
-   ui->label_5->setText(QString("Абсолютный MIN = ") + min + QString("нм"));
-   ui->maxHeightSlider->setSingleStep(interval);
-   ui->maxHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
-   ui->maxHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
-   ui->minHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
-   ui->minHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
-   ui->maxHeightSlider->setValue(static_cast<int>(maxNumber * 10));
-   ui->minHeightSlider->setValue(static_cast<int>((maxNumber - minNumber) / 4) * 10);
-
+    buildImages();
 }
 
 void MainWindow::updateTableWidget()
@@ -408,8 +414,15 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         for (int i = 0; i < listWidget->selectedItems().size(); ++i)
         {
             QListWidgetItem *item = listWidget->takeItem(listWidget->currentRow());
+            auto& series = StaticModel::shared().series;
+            auto it = std::find_if(series.begin(),series.end(),[&item](SeriaModel& seria){return seria.getFolderPath() == item->text();});
+            if (it != series.end())
+            {
+                series.erase(it);
+            }
             delete item;
         }
+
     });
 
     QAction *removeAll = new QAction(QString("Удалить все"),this);

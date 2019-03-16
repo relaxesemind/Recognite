@@ -27,6 +27,9 @@ void StaticModel::dropModel()
     inputModels.clear();
     objectsMap.clear();
     series.clear();
+
+    absoluteMAXheight = std::numeric_limits<int>::min();
+    absoluteMINheight = std::numeric_limits<int>::max();
 }
 
 void StaticModel::addDestPair(const QString &path, const QImage &image)

@@ -102,7 +102,12 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
     for (QString const& file : files)
     {
-        auto objectsForFile = *objects.find(file);
+        auto it = objects.find(file);
+        if (it == objects.end())
+        {
+            continue;
+        }
+        auto & objectsForFile = *it;
         std::for_each(objectsForFile.begin(),objectsForFile.end(),[&frequencies, min, max, singleInterval](Area& object)
         {
             float height = object.getMaxHeight().height;
@@ -138,14 +143,14 @@ void Core::calculateFrequenciesWithInterval(const QString &seriaPath, float inte
 QMap<QString, QVector<QPointF>> Core::calcPointsForGraph()
 {
     QMap<QString, QVector<QPointF>> map;
-    auto & freqM = StaticModel::shared().frequencies;
+    auto &freqM = StaticModel::shared().frequencies;
 
     for (auto it = freqM.begin(); it != freqM.end(); ++it)
     {
         auto data = it.value();
-        QVector<QPointF> points(data.size());
+        QVector<QPointF> points(data.size(),QPointF());
 
-        repeat(i,data.size())
+        for (int i = 0; i < data.size(); ++i)
         {
             points[i] = QPointF(i,data[i]);
         }
@@ -248,7 +253,6 @@ void Core::getTrueHeights(const InputModel& model, QVector<Area>& objects)
         float h = (h1 + h2 + h3 + h4) / 4;
 
         qDebug() << "traverseIsFlat! h = " << h;
-//        std::cout << "walk is flat! (" << height.x << "," << height.y << ") h = " << h << std::endl;
 
         std::for_each(area.points.begin(),area.points.end(),[h](HeightCoordinate& coord)
         {

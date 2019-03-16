@@ -11,10 +11,12 @@
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QBarSeries>
+#include <QtCharts/QStackedBarSeries>
 #include <QtCharts/QBarSet>
 #include <QDebug>
 #include <QRubberBand>
 #include <QtCharts/QValueAxis>
+
 
 class GrapherMode
  {
@@ -82,6 +84,7 @@ private:
     float minX,maxX;
     float minY,maxY;
     QRubberBand *rubberBand;
+    QStackedBarSeries *stackSeria;
 };
 
 #endif // GRAPHER_H

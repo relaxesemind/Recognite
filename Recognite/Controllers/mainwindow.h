@@ -88,6 +88,7 @@ private:
     void makeImageFromFilePath(const QString& path);
     void setupListWidget();
     void setupImageView();
+    void buildImages();
 
 private:
     Ui::MainWindow *ui;

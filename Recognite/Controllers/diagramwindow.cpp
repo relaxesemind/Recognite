@@ -16,8 +16,7 @@ DiagramWindow::DiagramWindow(QWidget *parent) :
     ui->horizontalSlider->setValue(30);
     ui->lineEdit->setText("0.30нм");
 
-    auto & series = StaticModel::shared().series;
-
+    auto &series = StaticModel::shared().series;
     std::for_each(series.begin(),series.end(),[this](SeriaModel& seria)
     {
        barColors.insert(seria.getFolderPath(),gena.get());

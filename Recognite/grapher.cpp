@@ -4,6 +4,7 @@ Grapher::Grapher()
 {
     view = new ChartView();
     chart = new QChart();
+    stackSeria = new QStackedBarSeries();
 
     view->setChart(chart);
     view->setRenderHint(QPainter::Antialiasing);
@@ -21,24 +22,25 @@ void Grapher::updateState()
     chart->setTitleBrush(QBrush(Qt::black));
     chart->setTitle("Распределение по высотам");
 
-    QValueAxis *axisX = new QValueAxis();
-    QValueAxis *axisY = new QValueAxis();
+//    QValueAxis *axisX = new QValueAxis();
+//    QValueAxis *axisY = new QValueAxis();
 
-    axisY->setMax(maxY * 100);
-    axisY->setMin(minY * 100);
+//    axisY->setMax(maxY * 100);
+//    axisY->setMin(minY * 100);
 
-    axisX->setMin(minX);
-    axisX->setMax(maxX);
+//    axisX->setMin(minX);
+//    axisX->setMax(maxX);
 
-    axisX->setLabelFormat("%.1f nm");
-    axisY->setLabelFormat("%.1f%%");
+//    axisX->setLabelFormat("%.1f nm");
+//    axisY->setLabelFormat("%.1f%%");
 
-    axisX->setTickCount(8);
-    axisY->setTickCount(8);
+//    axisX->setTickCount(8);
+//    axisY->setTickCount(8);
 
-    chart->setAxisX(axisX);
-    chart->setAxisY(axisY);
+//    chart->setAxisX(axisX);
+//    chart->setAxisY(axisY);
 
+    chart->setAnimationOptions(QChart::SeriesAnimations);
 }
 
 void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, GrapherMode::Options mode, QColor barColor, QColor lineColor)
@@ -48,27 +50,23 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
 
     if (mode & GrapherMode::BarVisible)
     {
-        QBarSeries *series = new QBarSeries();
-        QBarSet *barSet = new QBarSet("",nullptr);
+//        QBarSet *barSet = new QBarSet("",nullptr);
 
-        for (QPointF p : points)
-        {
-            barSet->append(p.y());
-        }
+//        for (QPointF p : points)
+//        {
+//            barSet->append(p.y());
+//        }
 
-        barSet->setColor(barColor);
-        series->insert(0,barSet);
-        series->setName(title);
-        chart->addSeries(series);
+//        barSet->setColor(barColor);
+//        stackSeria->insert(0,barSet);
+//        stackSeria->setName(title);
+//        chart->addSeries(stackSeria);
     }
 
     if (mode & GrapherMode::SplineVisible)
     {
         QSplineSeries *seriesLine = new QSplineSeries();
-        for (QPointF p : points)
-        {
-            seriesLine->append(p);
-        }
+        seriesLine->append(points.toList());
 
         QPen pen(lineColor);
         pen.setWidthF(2.5);
@@ -77,6 +75,7 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
         seriesLine->setName(title);
         chart->addSeries(seriesLine);
     }
+    chart->createDefaultAxes();
 }
 
 void Grapher::clearView()
