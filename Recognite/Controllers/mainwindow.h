@@ -57,10 +57,6 @@ private slots:
 
     void on_minHeightSlider_valueChanged(int value);
 
-    void on_maxHeightLineEdit_textChanged(const QString &arg1);
-
-    void on_minHeightLineEdit_textEdited(const QString &arg1);
-
     void on_pushButton_clicked();
 
     void on_tableWidget_clicked(const QModelIndex &index);
@@ -80,6 +76,10 @@ private slots:
     void on_listWidget_itemClicked(QListWidgetItem *item);
 
     void selectingTaskIsFinished();
+
+    void on_maxHeightLineEdit_editingFinished();
+
+    void on_minHeightLineEdit_editingFinished();
 
 private:
     void updateTableWidget();

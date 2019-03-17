@@ -77,13 +77,15 @@ void DiagramWindow::drawGraph()
     });
 
     Grapher::shared().setXRange(min,max);
-    Grapher::shared().setYRange(static_cast<float>(yMin) / sum,static_cast<float>(yMax) / sum);
+    Grapher::shared().setYRange(static_cast<float>(yMin * 100) / static_cast<float>(sum),
+                                static_cast<float>(yMax * 100) / static_cast<float>(sum));
     Grapher::shared().updateState();
 
     for (auto it = pointsForGraph.begin(); it != pointsForGraph.end(); ++it)
     {
-        QStringList legendTitle = it.key().split(QDir::separator());
-        if (!legendTitle.isEmpty())
+        QStringList legendTitle = it.key().split('/');
+
+        if (!legendTitle.isEmpty() and !it.value().isEmpty())
         {
             Grapher::shared().addGraph(it.value(),legendTitle.last(),mode,barColors[it.key()],splineColors[it.key()]);
         }

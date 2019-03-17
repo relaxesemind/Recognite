@@ -4,7 +4,6 @@ Grapher::Grapher()
 {
     view = new ChartView();
     chart = new QChart();
-    stackSeria = new QStackedBarSeries();
 
     view->setChart(chart);
     view->setRenderHint(QPainter::Antialiasing);
@@ -22,25 +21,7 @@ void Grapher::updateState()
     chart->setTitleBrush(QBrush(Qt::black));
     chart->setTitle("Распределение по высотам");
 
-//    QValueAxis *axisX = new QValueAxis();
-//    QValueAxis *axisY = new QValueAxis();
-
-//    axisY->setMax(maxY * 100);
-//    axisY->setMin(minY * 100);
-
-//    axisX->setMin(minX);
-//    axisX->setMax(maxX);
-
-//    axisX->setLabelFormat("%.1f nm");
-//    axisY->setLabelFormat("%.1f%%");
-
-//    axisX->setTickCount(8);
-//    axisY->setTickCount(8);
-
-//    chart->setAxisX(axisX);
-//    chart->setAxisY(axisY);
-
-    chart->setAnimationOptions(QChart::SeriesAnimations);
+//    chart->setAnimationOptions(QChart::SeriesAnimations);
 }
 
 void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, GrapherMode::Options mode, QColor barColor, QColor lineColor)
@@ -50,17 +31,18 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
 
     if (mode & GrapherMode::BarVisible)
     {
-//        QBarSet *barSet = new QBarSet("",nullptr);
+        QBarSet *barSet = new QBarSet("",nullptr);
+        QBarSeries *seria = new QBarSeries();
 
-//        for (QPointF p : points)
-//        {
-//            barSet->append(p.y());
-//        }
+        for (QPointF p : points)
+        {
+            barSet->append(p.y());
+        }
 
-//        barSet->setColor(barColor);
-//        stackSeria->insert(0,barSet);
-//        stackSeria->setName(title);
-//        chart->addSeries(stackSeria);
+        barSet->setColor(barColor);
+        seria->append(barSet);
+        seria->setName(title);
+        chart->addSeries(seria);
     }
 
     if (mode & GrapherMode::SplineVisible)
@@ -75,7 +57,31 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
         seriesLine->setName(title);
         chart->addSeries(seriesLine);
     }
+
+    if (chart->series().isEmpty())
+    {
+        return;
+    }
+
     chart->createDefaultAxes();
+
+    QValueAxis *axisX = new QValueAxis();
+    QValueAxis *axisY = new QValueAxis();
+
+    axisY->setMax(maxY);
+    axisY->setMin(minY);
+
+    axisX->setMin(minX);
+    axisX->setMax(maxX);
+
+    axisX->setLabelFormat("%.1f nm");
+    axisY->setLabelFormat("%.1f%%");
+
+    axisX->setTickCount(8);
+    axisY->setTickCount(8);
+
+    chart->setAxisX(axisX);
+    chart->setAxisY(axisY);
 }
 
 void Grapher::clearView()

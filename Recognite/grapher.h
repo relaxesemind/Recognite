@@ -84,7 +84,7 @@ private:
     float minX,maxX;
     float minY,maxY;
     QRubberBand *rubberBand;
-    QStackedBarSeries *stackSeria;
+//    QStackedBarSeries *stackSeria;
 };
 
 #endif // GRAPHER_H

@@ -49,14 +49,14 @@ void MainWindow::setupListWidget()
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
 
     //mock
-    listWidget->addItems({
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)"
-                         });
-    SeriaModel s1("/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)"),
-               s2("/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)");
-    StaticModel::shared().series.append({s1,s2});
-    CurrentAppState::shared().currentSeria = s1;
+//    listWidget->addItems({
+//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)",
+//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(2)"
+//                         });
+//    SeriaModel s1("C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)"),
+//               s2("C:/dev/selection_new/txt/seria-300119/seria-300119-sample(2)");
+//    StaticModel::shared().series.append({s1,s2});
+//    CurrentAppState::shared().currentSeria = s1;
 }
 
 void MainWindow::setupImageView()
@@ -192,45 +192,6 @@ void MainWindow::on_minHeightSlider_valueChanged(int value)
     {
         ui->minHeightSlider->setValue(ui->maxHeightSlider->value());
     }
-}
-
-void MainWindow::on_maxHeightLineEdit_textChanged(const QString &arg1)
-{
-//    bool ok;
-//    int number = arg1.toFloat(&ok);
-//    if (!ok)
-//    {
-//        float fValue = static_cast<float>(ui->maxHeightSlider->value()) / 10.f;
-//        ui->maxHeightLineEdit->setText(QString::number(fValue,'f',1));
-//    }
-
-//    if (number > 255)
-//    {
-//        ui->maxHeightLineEdit->setText(QString::number(255));
-//    }
-//    if (number < 0)
-//    {
-//        ui->maxHeightLineEdit->setText(QString::number(0));
-//    }
-}
-
-void MainWindow::on_minHeightLineEdit_textEdited(const QString &arg1)
-{
-//    bool ok;
-//    int number = arg1.toInt(&ok,10);
-//    if (!ok)
-//    {
-//        ui->minHeightLineEdit->setText(QString::number(ui->minHeightSlider->value()));
-//    }
-
-//    if (number > 255)
-//    {
-//        ui->minHeightLineEdit->setText(QString::number(255));
-//    }
-//    if (number < 0)
-//    {
-//        ui->minHeightLineEdit->setText(QString::number(0));
-//    }
 }
 
 void MainWindow::on_pushButton_clicked()//build images
@@ -387,7 +348,7 @@ void MainWindow::showListMenuAtPos(QPoint pos)
     QPoint globalPos = listWidget->mapToGlobal(pos);
     QMenu menu(this);
 
-    QAction *addItemAction = new QAction(QString("Добавить файлы"),this);
+    QAction *addItemAction = new QAction(QString("Добавить серию"),this);
 
     connect(addItemAction,&QAction::triggered,this,[&listWidget,this]
     {
@@ -406,15 +367,20 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         StaticModel::shared().series.append(seria);
     });
 
-    QAction *removeAction = new QAction(QString("Удалить файл"),this);
+    QAction *removeAction = new QAction(QString("Удалить серию"),this);
     removeAction->setShortcut(QKeySequence::Delete);
 
-    connect(removeAction,&QAction::triggered,this,[&listWidget]
+
+
+    connect(removeAction,&QAction::triggered,this,[&listWidget, this]
     {
+        auto& series = StaticModel::shared().series;
+
+        qDebug() << "до - " << series.count();
+
         for (int i = 0; i < listWidget->selectedItems().size(); ++i)
         {
             QListWidgetItem *item = listWidget->takeItem(listWidget->currentRow());
-            auto& series = StaticModel::shared().series;
             auto it = std::find_if(series.begin(),series.end(),[&item](SeriaModel& seria){return seria.getFolderPath() == item->text();});
             if (it != series.end())
             {
@@ -422,7 +388,16 @@ void MainWindow::showListMenuAtPos(QPoint pos)
             }
             delete item;
         }
-
+        if (series.count())
+        {
+           CurrentAppState::shared().currentSeria = series.first();
+        }
+        StaticModel::shared().sources.clear();
+        StaticModel::shared().dests.clear();
+        StaticModel::shared().frequencies.clear();
+        StaticModel::shared().objectsMap.clear();
+        this->buildImages();
+        qDebug() << "После - " << series.count();
     });
 
     QAction *removeAll = new QAction(QString("Удалить все"),this);
@@ -486,7 +461,28 @@ void MainWindow::selectingTaskIsFinished()
     updateViewWithSeria();
 }
 
+void MainWindow::on_maxHeightLineEdit_editingFinished()
+{
+    bool ok;
+    float number = ui->maxHeightLineEdit->text().toFloat(&ok);
+    if (!ok)
+    {
+        float fValue = static_cast<float>(ui->maxHeightSlider->value()) / 10.f;
+        ui->maxHeightLineEdit->setText(QString::number(fValue,'f',1));
+    }
 
+    ui->maxHeightSlider->setValue(static_cast<int>(number * 10));
+}
 
+void MainWindow::on_minHeightLineEdit_editingFinished()
+{
+    bool ok;
+    float number = ui->minHeightLineEdit->text().toFloat(&ok);
+    if (!ok)
+    {
+        float fValue = static_cast<float>(ui->minHeightSlider->value()) / 10.f;
+        ui->minHeightLineEdit->setText(QString::number(fValue,'f',1));
+    }
 
-
+    ui->minHeightSlider->setValue(static_cast<int>(number * 10));
+}

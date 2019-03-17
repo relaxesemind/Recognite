@@ -19,7 +19,7 @@ public:
     {
         auto s = std::chrono::system_clock::now().time_since_epoch().count();
         re.seed(s);
-    };
+    }
 
     uint operator()()
     {
