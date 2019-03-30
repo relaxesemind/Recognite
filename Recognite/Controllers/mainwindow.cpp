@@ -4,8 +4,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    pool(new QThreadPool(this)),
-    selectingTask(nullptr)
+    pool(new QThreadPool(this))
 {
     ui->setupUi(this);
     ui->menuBar->setNativeMenuBar(false);
@@ -311,14 +310,16 @@ void MainWindow::on_processPushButton_clicked()
     }
 
     dests.clear();
-    selectingTask = new SelectingProcessManager(std::move(paths));
+    SelectingProcessManager *selectingTask = new SelectingProcessManager(std::move(paths));
 
     connect(selectingTask,&SelectingProcessManager::destPair,&StaticModel::shared(),&StaticModel::addDestPair);
     connect(selectingTask,&SelectingProcessManager::setEnableDiagram,this,&MainWindow::enableDiagramButton);
     connect(selectingTask,&SelectingProcessManager::processPercent,this,&MainWindow::updateProcessPercentage);
     connect(selectingTask,&SelectingProcessManager::isDone,this,&MainWindow::selectingTaskIsFinished);
-    connect(selectingTask,&SelectingProcessManager::isRunning,this,[](bool isRunning){
+    connect(selectingTask,&SelectingProcessManager::isRunning,this,[this](bool isRunning)
+    {
         CurrentAppState::shared().selectingTaskIsRunning = isRunning;
+        this->ui->processPushButton->setEnabled(!isRunning);
     });
 
     pool->start(selectingTask);

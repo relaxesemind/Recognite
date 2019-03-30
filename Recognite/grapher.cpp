@@ -63,7 +63,7 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
         return;
     }
 
-    chart->createDefaultAxes();
+//    chart->createDefaultAxes();
 
     QValueAxis *axisX = new QValueAxis();
     QValueAxis *axisY = new QValueAxis();

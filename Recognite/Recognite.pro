@@ -73,7 +73,8 @@ HEADERS += \
     Models/seriamodel.h \
     Common/colorgenerator.h \
     Managers/imagesbuiderprocess.h \
-    Views/waitingspinnerwidget.h
+    Views/waitingspinnerwidget.h \
+    Managers/autoheightapproachproccess.h
 
 SOURCES += \
     Common/currentappstate.cpp \
@@ -95,4 +96,5 @@ SOURCES += \
     Models/seriamodel.cpp \
     Common/colorgenerator.cpp \
     Managers/imagesbuiderprocess.cpp \
-    Views/waitingspinnerwidget.cpp
+    Views/waitingspinnerwidget.cpp \
+    Managers/autoheightapproachproccess.cpp

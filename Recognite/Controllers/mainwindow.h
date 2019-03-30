@@ -99,7 +99,7 @@ private:
 private:
     Ui::MainWindow *ui;
     QThreadPool *pool;
-    SelectingProcessManager *selectingTask;
+//    SelectingProcessManager *selectingTask;
     QString folderPath;
     WaitingSpinnerWidget *spinner;
 };
