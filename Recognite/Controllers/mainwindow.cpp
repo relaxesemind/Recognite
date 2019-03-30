@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->menuBar->setNativeMenuBar(false);
+    folderPath = "/home";
 
     setupListWidget();
     setupImageView();
@@ -30,17 +31,6 @@ void MainWindow::enableDiagramButton(bool flag)
     ui->diagramPushButton->setEnabled(flag);
 }
 
-void MainWindow::makeImageFromFilePath(const QString &path)
-{
-    QImage image = Core::shared().imageFromTxtFile(path);
-    auto& sources = StaticModel::shared().sources;
-
-    if (std::find(sources.begin(),sources.end(), image) == sources.end())
-    {
-        sources.insert(path,image);
-    }
-}
-
 void MainWindow::setupListWidget()
 {
     QListWidget *listWidget = ui->listWidget;
@@ -48,15 +38,15 @@ void MainWindow::setupListWidget()
     ui->imageView->addGradientAxis(0,0);
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
 
-    //mock
-//    listWidget->addItems({
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)",
-//                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(2)"
-//                         });
-//    SeriaModel s1("C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)"),
-//               s2("C:/dev/selection_new/txt/seria-300119/seria-300119-sample(2)");
-//    StaticModel::shared().series.append({s1,s2});
-//    CurrentAppState::shared().currentSeria = s1;
+    //mock windows
+    listWidget->addItems({
+                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)",
+                             "C:/dev/selection_new/txt/seria-300119/seria-300119-sample(2)"
+                         });
+    SeriaModel s1("C:/dev/selection_new/txt/seria-300119/seria-300119-sample(1)"),
+               s2("C:/dev/selection_new/txt/seria-300119/seria-300119-sample(2)");
+    StaticModel::shared().series.append({s1,s2});
+    CurrentAppState::shared().currentSeria = s1;
 }
 
 void MainWindow::setupImageView()
@@ -78,82 +68,10 @@ void MainWindow::setupImageView()
     });
 }
 
-void MainWindow::buildImages()
-{
-    QListWidget *listWidget = ui->listWidget;
-    auto& sources = StaticModel::shared().sources;
-    StaticModel::shared().inputModels.clear();
-    sources.clear();
-
-    for (int i = 0; i < listWidget->count(); ++i)
-    {
-           QString path = listWidget->item(i)->text();
-           QDir folder(path);
-
-           if (!folder.exists())
-           {
-               continue;
-           }
-
-           SeriaModel seria(path);
-           QVector<QString> filePaths = seria.getFiles();
-
-           std::for_each(filePaths.begin(),filePaths.end(),[this](const QString& path)
-           {
-               this->makeImageFromFilePath(path);
-           });
-    }
-
-    if (listWidget->count())
-    {
-        CurrentAppState::shared().currentSeria = SeriaModel(listWidget->item(0)->text());
-    }
-    else
-    {
-        return;
-    }
-
-    // inputModels and sources is ready
-
-    qDebug() << "inputModels size = " << StaticModel::shared().inputModels.size();
-    qDebug() << "sources size = " << StaticModel::shared().sources.size();
-
-    if (!sources.isEmpty())
-    {
-        auto firstIt = sources.begin();
-        ui->imageView->setImage(QPixmap::fromImage(firstIt.value()));
-        CurrentAppState::shared().currentFilePath = firstIt.key();
-    }
-    else
-    {
-        return;
-    }
-
-
-   this->updateTableWidget();
-
-   auto pair = Core::shared().findAbsoluteMaxMinHeights();
-   float maxNumber = pair.first;
-   float minNumber = pair.second;
-   QString max = QString::number(pair.first);
-   QString min = QString::number(pair.second);
-   int interval = static_cast<int>((maxNumber - minNumber) / 30);
-
-   ui->label_4->setText(QString("Абсолютный MAX = ") + max + QString("нм"));
-   ui->label_5->setText(QString("Абсолютный MIN = ") + min + QString("нм"));
-   ui->maxHeightSlider->setSingleStep(interval);
-   ui->maxHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
-   ui->maxHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
-   ui->minHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
-   ui->minHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
-   ui->maxHeightSlider->setValue(static_cast<int>(maxNumber * 10));
-   ui->minHeightSlider->setValue(static_cast<int>((maxNumber - minNumber) / 4) * 10);
-}
-
-void MainWindow::on_loadTxtFiles_triggered()
+void MainWindow::addSeria()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Выберите папку с серией изображений"),
-                                                 "/home",
+                                                 folderPath,
                                                  QFileDialog::ShowDirsOnly
                                                  | QFileDialog::DontResolveSymlinks);
     if (path.isEmpty())
@@ -168,6 +86,87 @@ void MainWindow::on_loadTxtFiles_triggered()
     SeriaModel seria(path);
     CurrentAppState::shared().currentSeria = seria;
     StaticModel::shared().series.append(seria);
+    folderPath = seria.getFolderPath();
+}
+
+void MainWindow::buildImages()
+{
+    auto& sources = StaticModel::shared().sources;
+    auto& series = StaticModel::shared().series;
+    StaticModel::shared().inputModels.clear();
+
+    ImagesBuiderProcess *process = new ImagesBuiderProcess(series);
+
+    connect(process,&ImagesBuiderProcess::isRunning,this,[this](bool currentlyRunning)
+    {
+        if (currentlyRunning)
+        {
+            spinner = new WaitingSpinnerWidget(ui->imageView, Qt::ApplicationModal, true);
+            spinner->setRoundness(70.0);
+            spinner->setMinimumTrailOpacity(15.0);
+            spinner->setTrailFadePercentage(70.0);
+            spinner->setNumberOfLines(12);
+            spinner->setLineLength(12);
+            spinner->setLineWidth(4);
+            spinner->setInnerRadius(10);
+            spinner->setRevolutionsPerSecond(1);
+            spinner->start();
+        }
+        else if (spinner != nullptr)
+        {
+            spinner->stop();
+            delete spinner;
+            spinner = nullptr;
+        }
+    });
+
+    connect(process,&ImagesBuiderProcess::isDone,this,[this, &sources](bool status)
+    {
+        if (!status)
+        {
+            return ;
+        }
+
+        qDebug() << "inputModels size = " << StaticModel::shared().inputModels.size();
+        qDebug() << "sources size = " << StaticModel::shared().sources.size();
+
+        if (!sources.isEmpty())
+        {
+            auto firstIt = sources.begin();
+            ui->imageView->setImage(QPixmap::fromImage(firstIt.value()));
+            CurrentAppState::shared().currentFilePath = firstIt.key();
+        }
+        else
+        {
+            return;
+        }
+
+       this->updateTableWidget();
+
+       auto pair = Core::shared().findAbsoluteMaxMinHeights();
+       float maxNumber = pair.first;
+       float minNumber = pair.second;
+       QString max = QString::number(pair.first);
+       QString min = QString::number(pair.second);
+       int interval = static_cast<int>((maxNumber - minNumber) / 30);
+
+       ui->label_4->setText(QString("Абсолютный MAX = ") + max + QString("нм"));
+       ui->label_5->setText(QString("Абсолютный MIN = ") + min + QString("нм"));
+       ui->maxHeightSlider->setSingleStep(interval);
+       ui->maxHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
+       ui->maxHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
+       ui->minHeightSlider->setMaximum(static_cast<int>(maxNumber * 10));
+       ui->minHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
+       ui->maxHeightSlider->setValue(static_cast<int>(maxNumber * 10));
+       ui->minHeightSlider->setValue(static_cast<int>((maxNumber - minNumber) / 4) * 10);
+    });
+
+    this->pool->start(process);
+}
+
+void MainWindow::on_loadTxtFiles_triggered()
+{
+    addSeria();
 }
 
 void MainWindow::on_maxHeightSlider_valueChanged(int value)
@@ -352,19 +351,7 @@ void MainWindow::showListMenuAtPos(QPoint pos)
 
     connect(addItemAction,&QAction::triggered,this,[&listWidget,this]
     {
-        QString path = QFileDialog::getExistingDirectory(this, tr("Выберите папку с серией изображений"),
-                                                     "/home",
-                                                     QFileDialog::ShowDirsOnly
-                                                     | QFileDialog::DontResolveSymlinks);
-        if (path.isEmpty())
-        {
-            return;
-        }
-
-        listWidget->addItem(path);
-        SeriaModel seria(path);
-        CurrentAppState::shared().currentSeria = seria;
-        StaticModel::shared().series.append(seria);
+        this->addSeria();
     });
 
     QAction *removeAction = new QAction(QString("Удалить серию"),this);

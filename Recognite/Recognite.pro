@@ -71,7 +71,9 @@ HEADERS += \
     staticmodel.h \
     Managers/selectingprocessmanager.h \
     Models/seriamodel.h \
-    Common/colorgenerator.h
+    Common/colorgenerator.h \
+    Managers/imagesbuiderprocess.h \
+    Views/waitingspinnerwidget.h
 
 SOURCES += \
     Common/currentappstate.cpp \
@@ -91,4 +93,6 @@ SOURCES += \
     staticmodel.cpp \
     Managers/selectingprocessmanager.cpp \
     Models/seriamodel.cpp \
-    Common/colorgenerator.cpp
+    Common/colorgenerator.cpp \
+    Managers/imagesbuiderprocess.cpp \
+    Views/waitingspinnerwidget.cpp

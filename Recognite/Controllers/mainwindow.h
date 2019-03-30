@@ -5,12 +5,17 @@
 #include "diagramwindow.h"
 #include "Managers/parser.h"
 #include "core.h"
+
 #include "Managers/selectingprocessmanager.h"
+#include "Managers/imagesbuiderprocess.h"
+
 #include "staticmodel.h"
 #include "parsersettingsdialog.h"
 #include "traversewalksettings.h"
 #include "Common/currentappstate.h"
+
 #include "Views/ImageView/imageview.h"
+#include "Views/waitingspinnerwidget.h"
 
 
 #include <QMainWindow>
@@ -88,12 +93,15 @@ private:
     void makeImageFromFilePath(const QString& path);
     void setupListWidget();
     void setupImageView();
+    void addSeria();
     void buildImages();
 
 private:
     Ui::MainWindow *ui;
     QThreadPool *pool;
     SelectingProcessManager *selectingTask;
+    QString folderPath;
+    WaitingSpinnerWidget *spinner;
 };
 
 #endif // MAINWINDOW_H
