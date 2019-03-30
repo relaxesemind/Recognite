@@ -12,7 +12,8 @@ QImage Core::imageFromTxtFile(const QString &path)
        return QImage();
    }
 
-   InputModel model = parser.inputModelFromFile(path);
+   InputModel model = SettingsStorage::shared().commasParse ?
+               parser.inputModelFromFileWithCommas(path) : parser.inputModelFromFile(path);
 
    if (!model.isValid())
    {

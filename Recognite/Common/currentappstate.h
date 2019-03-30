@@ -28,7 +28,6 @@ public:
    SeriaModel currentSeria;
    bool selectingTaskIsRunning; // поток с выделением областей
    ImageViewMode imageViewMode;
-
 };
 
 #endif // CURRENTAPPSTATE_H

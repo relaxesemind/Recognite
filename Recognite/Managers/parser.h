@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>
 
 #include "Common/magic.h"
 #include "Models/inputmodel.h"
@@ -18,6 +19,7 @@ public:
      Parser() = default;
 
      InputModel inputModelFromFile(const QString& path, int id = 0);
+     InputModel inputModelFromFileWithCommas(const QString& path, int id = 0);
 
 };
 

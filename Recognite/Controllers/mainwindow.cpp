@@ -115,6 +115,7 @@ void MainWindow::buildImages()
         else if (spinner != nullptr)
         {
             spinner->stop();
+
             delete spinner;
             spinner = nullptr;
         }
@@ -124,7 +125,7 @@ void MainWindow::buildImages()
     {
         if (!status)
         {
-            return ;
+            return;
         }
 
         qDebug() << "inputModels size = " << StaticModel::shared().inputModels.size();

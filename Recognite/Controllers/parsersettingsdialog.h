@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "Common/settingsstorage.h"
+#include <QDebug>
 
 
 namespace Ui {
@@ -19,6 +20,8 @@ public:
 
 private slots:
     void on_buttonBox_accepted();
+
+    void on_checkBox_clicked(bool checked);
 
 private:
     Ui::ParserSettingsDialog *ui;
