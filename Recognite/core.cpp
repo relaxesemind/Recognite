@@ -84,11 +84,8 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
     auto& frequencies = *it;
     auto& objects = StaticModel::shared().objectsMap;
-
     float max = StaticModel::shared().absoluteMAXheight;
     float min = StaticModel::shared().absoluteMINheight;
-
-
     float singleInterval = std::abs(max - min) / numOfColumn;
 
     qDebug() << "max = " << max << " min = " << min;
@@ -100,6 +97,7 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
     SeriaModel seria(seriaPath);
     QVector<QString> files = seria.getFiles();
+    int sum = 0;
 
     for (QString const& file : files)
     {
@@ -108,13 +106,13 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
         {
             continue;
         }
-        auto & objectsForFile = *it;
-        std::for_each(objectsForFile.begin(),objectsForFile.end(),[&frequencies, min, max, singleInterval](Area& object)
+        auto& objectsForFile = *it;
+        std::for_each(objectsForFile.begin(),objectsForFile.end(),[&frequencies, min, max, singleInterval, &sum](Area& object)
         {
             float height = object.getMaxHeight().height;
             int column = 0;
 
-            while(height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
+            while (height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
             {
                 ++column;
             }
@@ -123,9 +121,20 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
             {
 
                ++frequencies[column];
+               ++sum;
             }
         });
     }
+
+
+    qDebug () << "freq before = " << frequencies;
+    std::transform(frequencies.begin(),frequencies.end(),frequencies.begin(),[sum](int& value)
+    {
+        return sum == 0 ? 0 : (value * 1000) / sum;
+    });
+
+    qDebug () << "freq after = " << frequencies;
+    qDebug () << "sum == " << sum;
 }
 
 void Core::calculateFrequenciesWithInterval(const QString &seriaPath, float interval)
