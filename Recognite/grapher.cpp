@@ -63,25 +63,25 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
         return;
     }
 
-//    chart->createDefaultAxes();
+    chart->createDefaultAxes();
 
     QValueAxis *axisX = new QValueAxis();
-    QValueAxis *axisY = new QValueAxis();
+//    QValueAxis *axisY = new QValueAxis();
 
-    axisY->setMax(maxY);
-    axisY->setMin(minY);
+//    axisY->setMax(maxY);
+//    axisY->setMin(minY);
 
     axisX->setMin(minX);
     axisX->setMax(maxX);
 
     axisX->setLabelFormat("%.1f nm");
-    axisY->setLabelFormat("%.1f%%");
+//    axisY->setLabelFormat("%.1f%%");
 
     axisX->setTickCount(8);
-    axisY->setTickCount(8);
+//    axisY->setTickCount(8);
 
     chart->setAxisX(axisX);
-    chart->setAxisY(axisY);
+//    chart->setAxisY(axisY);
 }
 
 void Grapher::clearView()

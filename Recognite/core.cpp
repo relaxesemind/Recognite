@@ -97,7 +97,6 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
     SeriaModel seria(seriaPath);
     QVector<QString> files = seria.getFiles();
-    int sum = 0;
 
     for (QString const& file : files)
     {
@@ -107,7 +106,7 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
             continue;
         }
         auto& objectsForFile = *it;
-        std::for_each(objectsForFile.begin(),objectsForFile.end(),[&frequencies, min, max, singleInterval, &sum](Area& object)
+        std::for_each(objectsForFile.begin(),objectsForFile.end(),[&frequencies, min, max, singleInterval](Area& object)
         {
             float height = object.getMaxHeight().height;
             int column = 0;
@@ -119,18 +118,17 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
             if (column < frequencies.size() - 1)
             {
-
                ++frequencies[column];
-               ++sum;
             }
         });
     }
 
+    int sum = std::accumulate(frequencies.begin(),frequencies.end(),0);
 
     qDebug () << "freq before = " << frequencies;
-    std::transform(frequencies.begin(),frequencies.end(),frequencies.begin(),[sum](int& value)
+    std::transform(frequencies.begin(),frequencies.end(),frequencies.begin(),[sum](int value)
     {
-        return sum == 0 ? 0 : (value * 1000) / sum;
+        return sum == 0 ? 0 : static_cast<int> (100 * (static_cast<float>(value) / static_cast<float>(sum)));
     });
 
     qDebug () << "freq after = " << frequencies;
