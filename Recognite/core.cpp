@@ -125,14 +125,19 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
     int sum = std::accumulate(frequencies.begin(),frequencies.end(),0);
 
-    qDebug () << "freq before = " << frequencies;
+//    qDebug () << "freq before = " << frequencies;
     std::transform(frequencies.begin(),frequencies.end(),frequencies.begin(),[sum](int value)
     {
         return sum == 0 ? 0 : static_cast<int> (100 * (static_cast<float>(value) / static_cast<float>(sum)));
     });
 
-    qDebug () << "freq after = " << frequencies;
-    qDebug () << "sum == " << sum;
+
+    QString qwe = seriaPath.split("/").last();
+    if (!qwe.isEmpty())
+    {
+        qDebug () << "frequencies[" << qwe << "] : " << frequencies;
+        qDebug () << "sum == " << sum;
+    }
 }
 
 void Core::calculateFrequenciesWithInterval(const QString &seriaPath, float interval)
