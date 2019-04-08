@@ -42,7 +42,7 @@
           <rect>
            <x>30</x>
            <y>20</y>
-           <width>647</width>
+           <width>700</width>
            <height>26</height>
           </rect>
          </property>
@@ -78,7 +78,14 @@
              <string/>
             </property>
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>нм</string>
             </property>
            </widget>
           </item>
@@ -191,7 +198,7 @@
     <bool>false</bool>
    </property>
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Экспорт диаграммы txt</string>

@@ -51,7 +51,8 @@ private slots:
 private:
     Ui::DiagramWindow *ui;
     void drawGraph();
-    void writeDataToStream(QTextStream &out);
+    void recalc();
+    void writeDataToStream(QTextStream &out, const SeriaModel &seria);
     QMap<QString, QVector<QPointF>> pointsForGraph;
     GrapherMode::Options mode;
     ColorGenerator<> gena;

@@ -10,7 +10,7 @@ std::pair<int, int> StaticModel::getMaxMinFrequencies() const
     int max = std::numeric_limits<int>::min();
     int min = std::numeric_limits<int>::max();
 
-    std::for_each(frequencies.begin(),frequencies.end(),[&min,&max](const QVector<int>& f)
+    std::for_each(frequenciesForExport.begin(),frequenciesForExport.end(),[&min,&max](const QVector<int>& f)
     {
         max = *std::max_element(f.begin(),f.end());
         min = *std::min_element(f.begin(),f.end());

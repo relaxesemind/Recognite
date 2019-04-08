@@ -77,6 +77,17 @@ QString SeriaModel::getFolderPath() const
     return folderPath;
 }
 
+QString SeriaModel::getSeriaLastComponent() const
+{
+    QStringList components = folderPath.split("/");
+    if (components.isEmpty())
+    {
+        return QString();
+    }
+
+    return components.last();
+}
+
 QVector<QString> SeriaModel::getFiles() const
 {
     return files;

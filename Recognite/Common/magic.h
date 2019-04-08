@@ -10,6 +10,8 @@
 
 #define str(__STRING__) QString("__STRING__")
 
+#define utf8Str(__text__) QString(__text__).toUtf8()
+
 #define repeat(counter, count) \
     for (int counter = 0; counter < count; ++counter)
 

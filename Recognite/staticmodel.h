@@ -45,7 +45,8 @@ public:
     float absoluteMINheight; // по абсолютно всем моделям
 
     QVector<SeriaModel> series;
-    QMap<QString, QVector<int>> frequencies; // частоты для диаграмм (ключ - путь к папке серии)
+    QMap<QString, QVector<float>> frequencies; // частоты для диаграмм (ключ - путь к папке серии)
+    QMap<QString, QVector<int>> frequenciesForExport;
     QMap<QString,QImage> sources, dests; // сурсы и десты для всего ключ - путь к txt
     QVector<InputModel> inputModels; // после парса из txt
     QMap<QString,QVector<Area>> objectsMap; // Объекты соответствуют единственной модели, Qstring - путь к txt

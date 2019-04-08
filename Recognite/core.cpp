@@ -82,7 +82,15 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
         it = StaticModel::shared().frequencies.insert(seriaPath,{});
     }
 
+    auto it2 = StaticModel::shared().frequenciesForExport.find(seriaPath);
+
+    if (it2 == StaticModel::shared().frequenciesForExport.end())
+    {
+        it2 = StaticModel::shared().frequenciesForExport.insert(seriaPath,{});
+    }
+
     auto& frequencies = *it;
+    auto& frequenciesForExport = *it2;
     auto& objects = StaticModel::shared().objectsMap;
     float max = StaticModel::shared().absoluteMAXheight;
     float min = StaticModel::shared().absoluteMINheight;
@@ -95,6 +103,12 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
     frequencies.clear();
     frequencies.resize(numOfColumn);
 
+    frequenciesForExport.clear();
+    frequenciesForExport.resize(numOfColumn);
+
+
+
+
     SeriaModel seria(seriaPath);
     QVector<QString> files = seria.getFiles();
 
@@ -106,7 +120,7 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
             continue;
         }
         auto& objectsForFile = *it;
-        std::for_each(objectsForFile.begin(),objectsForFile.end(),[&frequencies, min, max, singleInterval](Area& object)
+        std::for_each(objectsForFile.begin(),objectsForFile.end(),[&frequencies, min, max, singleInterval, &frequenciesForExport](Area& object)
         {
             float height = object.getMaxHeight().height;
             int column = 0;
@@ -118,17 +132,18 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
             if (column < frequencies.size() - 1)
             {
-               ++frequencies[column];
+               frequencies[column] += 1.f;
+               ++frequenciesForExport[column];
             }
         });
     }
 
     int sum = std::accumulate(frequencies.begin(),frequencies.end(),0);
 
-//    qDebug () << "freq before = " << frequencies;
+    qDebug () << "freq before = " << frequencies;
     std::transform(frequencies.begin(),frequencies.end(),frequencies.begin(),[sum](int value)
     {
-        return sum == 0 ? 0 : static_cast<int> (100 * (static_cast<float>(value) / static_cast<float>(sum)));
+        return sum == 0 ? 0 : 100 * ((value) / static_cast<float>(sum));
     });
 
 

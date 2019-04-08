@@ -21,6 +21,8 @@ public:
 
     QString getFolderPath() const;
 
+    QString getSeriaLastComponent() const;
+
     QVector<QString> getFiles() const;
 
 private://property

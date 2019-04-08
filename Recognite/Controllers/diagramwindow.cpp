@@ -14,7 +14,7 @@ DiagramWindow::DiagramWindow(QWidget *parent) :
     ui->horizontalSlider->setMinimum(2);
     ui->horizontalSlider->setMaximum(150);
     ui->horizontalSlider->setValue(30);
-    ui->lineEdit->setText("0.30нм");
+    ui->lineEdit->setText("0.30");
 
     auto &series = StaticModel::shared().series;
     std::for_each(series.begin(),series.end(),[this](SeriaModel& seria)
@@ -34,27 +34,27 @@ DiagramWindow::~DiagramWindow()
 
 void DiagramWindow::on_horizontalSlider_valueChanged(int value)
 {
-    ui->lineEdit->setText(QString::number(static_cast<float>(value ) / 100,'f',2) + QString("нм").toUtf8());
+    ui->lineEdit->setText(QString::number(static_cast<float>(value ) / 100,'f',2));
 }
 
 void DiagramWindow::on_lineEdit_editingFinished()
 {
     QString text = ui->lineEdit->text();
-    emit numberOfColumnDidChange(text.toInt());
+    bool ok;
+    float number = text.toFloat(&ok);
+    if (!ok)
+    {
+        float fValue = static_cast<float>(ui->horizontalSlider->value()) / 10.f;
+        ui->lineEdit->setText(QString::number(fValue,'f',1));
+    }
+
+    ui->horizontalSlider->setValue(static_cast<int>(number * 100));
+    recalc();
 }
 
 void DiagramWindow::on_pushButton_clicked()//recalc
 {
-    int value = ui->horizontalSlider->value();
-    float fValue = static_cast<float>(value) / 100;
-
-    auto& series = StaticModel::shared().series;
-    std::for_each(series.begin(),series.end(),[fValue](SeriaModel const& seria)
-    {
-        Core::shared().calculateFrequenciesWithInterval(seria.getFolderPath(),fValue);
-    });
-
-    drawGraph();
+    recalc();
 }
 
 void DiagramWindow::drawGraph()
@@ -71,7 +71,7 @@ void DiagramWindow::drawGraph()
     int yMax = pair.first;
     int sum = 0;
 
-    std::for_each(freq.begin(),freq.end(),[&sum](QVector<int> const& f)
+    std::for_each(freq.begin(),freq.end(),[&sum](QVector<float> const& f)
     {
         sum += std::accumulate(f.begin(),f.end(),0);
     });
@@ -83,43 +83,80 @@ void DiagramWindow::drawGraph()
 
     for (auto it = pointsForGraph.begin(); it != pointsForGraph.end(); ++it)
     {
+        int numberOfAreas = 0;
+        auto& objectsMap = StaticModel::shared().objectsMap;
+        SeriaModel seria(it.key());
+        auto files = seria.getFiles();
+
+        for (auto it = objectsMap.begin(); it != objectsMap.end(); ++it)
+        {
+            if (files.contains(it.key()))
+            {
+                numberOfAreas += it.value().size();
+            }
+        }
+
         QStringList legendTitle = it.key().split('/');
+        QString title = legendTitle.last() + " N = " + QString::number(numberOfAreas);
 
         if (!legendTitle.isEmpty() and !it.value().isEmpty())
         {
-            Grapher::shared().addGraph(it.value(),legendTitle.last(),mode,barColors[it.key()],splineColors[it.key()]);
+            Grapher::shared().addGraph(it.value(),title,mode,barColors[it.key()],splineColors[it.key()]);
         }
     }
 }
 
-void DiagramWindow::writeDataToStream(QTextStream& out)
+void DiagramWindow::recalc()
 {
-//    quint32 numberOfAreas = 0;
-//    int value = ui->horizontalSlider->value();
-//    float fValue = static_cast<float>(value) / 100;
-//    float max = StaticModel::shared().absoluteMAXheight;
-//    float min = StaticModel::shared().absoluteMINheight;
-//    auto& objectsMap = StaticModel::shared().objectsMap;
+    int value = ui->horizontalSlider->value();
+    float fValue = static_cast<float>(value) / 100;
 
-//    std::for_each(objectsMap.begin(),objectsMap.end(),[&numberOfAreas](QVector<Area>& vector){
-//        numberOfAreas += vector.size();
-//    });
+    auto& series = StaticModel::shared().series;
+    std::for_each(series.begin(),series.end(),[fValue](SeriaModel const& seria)
+    {
+        Core::shared().calculateFrequenciesWithInterval(seria.getFolderPath(),fValue);
+    });
 
-//    out << QString("Всего объектов : ").toUtf8() << QString::number(numberOfAreas) << "\n";
-//    out << QString("Абсолютный максимум : ").toUtf8() << QString::number(max,'f',1) << QString("нм").toUtf8()
-//        << QString(" Абсолютный минимум : ").toUtf8() << QString::number(min,'f',1) << QString("нм").toUtf8() << "\n";
-////    out << QString("Количество карманов : ").toUtf8() << numOfColumnsText << QString(" Интервал между карманами : ").toUtf8()
-////        << QString::number((max - min) / (float)numOfColumns,'f',2) << QString("нм.").toUtf8() << "\n";
-//    out << QString("Размер кармана : ").toUtf8() << QString::number(fValue,'f',2) << QString("нм").toUtf8() << "\n";
-
-//    for (int i = 0; i < pointsForGraph.count(); ++i)
-//    {
-//        out << QString::number(min + i*fValue,'f',2) << " " << QString::number(pointsForGraph[i].y()) << "\n";
-
-//    }
+    drawGraph();
 }
 
-QString generateFilePath()
+void DiagramWindow::writeDataToStream(QTextStream& out, SeriaModel const& seria)
+{
+    int numberOfAreas = 0;
+    int value = ui->horizontalSlider->value();
+    float fValue = static_cast<float>(value) / 100;
+    float max = StaticModel::shared().absoluteMAXheight;
+    float min = StaticModel::shared().absoluteMINheight;
+    auto& freq = StaticModel::shared().frequenciesForExport;
+    auto& objectsMap = StaticModel::shared().objectsMap;
+    auto files = seria.getFiles();
+
+    for (auto it = objectsMap.begin(); it != objectsMap.end(); ++it)
+    {
+        if (files.contains(it.key()))
+        {
+            numberOfAreas += it.value().size();
+        }
+    }
+
+
+    QString lastComponent = seria.getSeriaLastComponent();
+    out << utf8Str("Название серии : ") << lastComponent << "\n";
+    out << utf8Str("Количество объектов : ") << QString::number(numberOfAreas) << "\n";
+    out << utf8Str("Абсолютный максимум : ") << QString::number(max,'f',1) << utf8Str("нм")
+        << utf8Str(" Абсолютный минимум : ") << QString::number(min,'f',1) << utf8Str("нм") << "\n";
+    out << utf8Str("Размер кармана : ") << QString::number(fValue,'f',2) << utf8Str("нм") << "\n";
+
+    auto& points = freq[seria.getFolderPath()];
+
+    for (int i = 0; i < points.count(); ++i)
+    {
+        out << QString::number(min + i*fValue,'f',2) << " " << QString::number(points[i]) << "\n";
+
+    }
+}
+
+QString generateFilePath(QString const& unique)
 {
     QString initialPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/seriesExportTxt";
     bool ok;
@@ -142,25 +179,31 @@ QString generateFilePath()
 
 void DiagramWindow::on_exportFileAction_triggered()
 {
-    QString defaultFilter("Текстовые файлы (*.txt)");
-    QString path = QFileDialog::getSaveFileName(this,"Экспорт Диаграммы",QDir::currentPath(),
-                                                "Текстовые файлы (*.txt);;Все файлы (*.*)",&defaultFilter);
-    qDebug() << path;
-    if (path.isEmpty())
+    QString directory = QFileDialog::getExistingDirectory(this,"Экспорт серии", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+
+    if (directory.isEmpty())
     {
-        AppMessage("Ошибка","Некорректное название серии");
         return;
     }
 
-    QFile file(path);
-    if (file.open(QIODevice::WriteOnly | QFile::Text))
-    {
-        QTextStream stream(&file);
-        stream.setCodec("UTF-8");
-        writeDataToStream(stream);
-    }
+    auto& series = StaticModel::shared().series;
 
-    file.close();
+    repeat(i,series.count())
+    {
+        SeriaModel seria = series.at(i);
+        QString lastComponent = seria.getSeriaLastComponent();
+        QString path = directory + "/" + lastComponent + ".txt";
+        qDebug() << "export path = " << path;
+
+        QFile file(path);
+        if (file.open(QIODevice::ReadWrite | QFile::Text))
+        {
+            QTextStream stream(&file);
+            stream.setCodec("UTF-8");
+            writeDataToStream(stream, seria);
+        }
+        file.close();
+    }
 }
 
 

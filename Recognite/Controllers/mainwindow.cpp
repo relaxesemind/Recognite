@@ -48,14 +48,14 @@ void MainWindow::setupListWidget()
 //    CurrentAppState::shared().currentSeria = s1;
 
     //mock macOS
-    listWidget->addItems({
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)",
-                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)"
-                         });
-    SeriaModel s1("/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)"),
-               s2("/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)");
-    StaticModel::shared().series.append({s1,s2});
-    CurrentAppState::shared().currentSeria = s1;
+//    listWidget->addItems({
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)",
+//                             "/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)"
+//                         });
+//    SeriaModel s1("/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(1)"),
+//               s2("/Users/ivanovegor/Documents/dev/recognite/Recognite/txt/seria-300119/seria-300119-sample(2)");
+//    StaticModel::shared().series.append({s1,s2});
+//    CurrentAppState::shared().currentSeria = s1;
 }
 
 void MainWindow::setupImageView()
