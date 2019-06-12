@@ -97,6 +97,53 @@ void MainWindow::addSeria()
     folderPath = seria.getFolderPath();
 }
 
+void MainWindow::addSeries()
+{
+    QFileDialog dialog;
+    dialog.setFileMode(QFileDialog::DirectoryOnly);
+    dialog.setOption(QFileDialog::DontUseNativeDialog);
+    dialog.setOption(QFileDialog::ShowDirsOnly);
+    dialog.setDirectory(folderPath);
+
+
+    QListView *lView = dialog.findChild<QListView *>("listView");
+    if (lView)
+    {
+        lView->setSelectionMode(QAbstractItemView::MultiSelection);
+    }
+
+    QTreeView *tView = dialog.findChild<QTreeView *>();
+    if (tView)
+    {
+        tView->setSelectionMode(QAbstractItemView::MultiSelection);
+    }
+
+    dialog.exec();
+
+    auto dirs = dialog.selectedFiles();
+
+    if (dirs.count() == 0)
+    {
+        return;
+    }
+
+    for (QString& dir : dirs)
+    {
+        if (dir.isEmpty())
+        {
+            continue;
+        }
+
+        qDebug() << "dir : " << dir;
+
+        SeriaModel seria(dir);
+        CurrentAppState::shared().currentSeria = seria;
+        StaticModel::shared().series.append(seria);
+        folderPath = seria.getFolderPath();
+        ui->listWidget->addItem(dir);
+    }
+}
+
 void MainWindow::buildImages()
 {
     auto& sources = StaticModel::shared().sources;
@@ -181,6 +228,7 @@ void MainWindow::on_loadTxtFiles_triggered()
 void MainWindow::on_maxHeightSlider_valueChanged(int value)
 {
     float fValue = static_cast<float>(value) / 10.f;
+    CurrentAppState::shared().maxFromUI = fValue;
 
     ui->maxHeightLineEdit->setText(QString::number(fValue,'f',1));
 
@@ -193,6 +241,7 @@ void MainWindow::on_maxHeightSlider_valueChanged(int value)
 void MainWindow::on_minHeightSlider_valueChanged(int value)
 {
     float fValue = static_cast<float>(value) / 10.f;
+    CurrentAppState::shared().minFromUI = fValue;
 
     ui->minHeightLineEdit->setText(QString::number(fValue,'f',1));
 
@@ -365,6 +414,13 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         this->addSeria();
     });
 
+    QAction *addItemsAction = new QAction(QString("Добавить несколько серий"),this);
+
+    connect(addItemsAction,&QAction::triggered,this,[&listWidget,this]
+    {
+        this->addSeries();
+    });
+
     QAction *removeAction = new QAction(QString("Удалить серию"),this);
     removeAction->setShortcut(QKeySequence::Delete);
 
@@ -408,7 +464,7 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         StaticModel::shared().dropModel();
     });
 
-    menu.addActions({removeAction, addItemAction,removeAll});
+    menu.addActions({removeAction, addItemAction, addItemsAction,removeAll});
     menu.exec(globalPos);
 }
 
@@ -467,6 +523,7 @@ void MainWindow::on_maxHeightLineEdit_editingFinished()
     {
         float fValue = static_cast<float>(ui->maxHeightSlider->value()) / 10.f;
         ui->maxHeightLineEdit->setText(QString::number(fValue,'f',1));
+        CurrentAppState::shared().maxFromUI = fValue;
     }
 
     ui->maxHeightSlider->setValue(static_cast<int>(number * 10));
@@ -480,7 +537,44 @@ void MainWindow::on_minHeightLineEdit_editingFinished()
     {
         float fValue = static_cast<float>(ui->minHeightSlider->value()) / 10.f;
         ui->minHeightLineEdit->setText(QString::number(fValue,'f',1));
+        CurrentAppState::shared().minFromUI = fValue;
     }
 
     ui->minHeightSlider->setValue(static_cast<int>(number * 10));
 }
+
+void MainWindow::on_action_2_triggered()//load several series
+{
+    this->addSeries();
+}
+
+void MainWindow::on_action_3_triggered()//save images
+{
+    auto& sources = StaticModel::shared().sources;
+    int i = 0;
+    for (auto it = sources.begin(); it != sources.end(); ++it)
+    {
+        QImage image = it.value();
+//         img->save("c:\\1.jpg","JPG");
+        if (!image.save("C://dev/images" + QString::number(++i) + ".jpg","JPG"))
+        {
+            qDebug() << "failed";
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

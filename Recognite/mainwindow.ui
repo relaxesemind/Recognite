@@ -198,7 +198,7 @@
          <bool>true</bool>
         </property>
         <attribute name="horizontalHeaderVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
@@ -569,6 +569,7 @@
      <string>Меню</string>
     </property>
     <addaction name="loadTxtFiles"/>
+    <addaction name="action_2"/>
     <addaction name="separator"/>
     <addaction name="action"/>
     <addaction name="changeShowMode"/>
@@ -624,10 +625,15 @@
   </action>
   <action name="action_3">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>Открыть лог</string>
+    <string>Сохранить картинки</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>Добавить несколько серий </string>
    </property>
   </action>
  </widget>

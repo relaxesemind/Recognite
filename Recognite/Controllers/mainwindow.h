@@ -35,6 +35,7 @@
 #include <QToolTip>
 #include <QDir>
 #include <QFileInfo>
+#include <QTreeView>
 
 
 
@@ -86,6 +87,10 @@ private slots:
 
     void on_minHeightLineEdit_editingFinished();
 
+    void on_action_2_triggered();
+
+    void on_action_3_triggered();
+
 private:
     void updateTableWidget();
     void updateViewWithSeria();
@@ -94,6 +99,7 @@ private:
     void setupListWidget();
     void setupImageView();
     void addSeria();
+    void addSeries();
     void buildImages();
 
 private:

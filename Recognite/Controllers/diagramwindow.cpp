@@ -1,5 +1,6 @@
 #include "diagramwindow.h"
 #include "ui_diagramwindow.h"
+#include "Common/currentappstate.h"
 
 DiagramWindow::DiagramWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -9,10 +10,12 @@ DiagramWindow::DiagramWindow(QWidget *parent) :
     ui->menubar->setNativeMenuBar(false);
     mode = GrapherMode::SplineVisible;
 
+    this->setWindowTitle("Графики");
+
     //min = 0.02 nm  max = 2 nm x 100
 
     ui->horizontalSlider->setMinimum(2);
-    ui->horizontalSlider->setMaximum(150);
+    ui->horizontalSlider->setMaximum(250);
     ui->horizontalSlider->setValue(30);
     ui->lineEdit->setText("0.30");
 
@@ -61,8 +64,8 @@ void DiagramWindow::drawGraph()
 {
     Grapher::shared().clearView();
     pointsForGraph = Core::shared().calcPointsForGraph();
-    float max = StaticModel::shared().absoluteMAXheight;
-    float min = StaticModel::shared().absoluteMINheight;
+    float max =  CurrentAppState::shared().maxFromUI;
+    float min = CurrentAppState::shared().minFromUI;
     auto pair = StaticModel::shared().getMaxMinFrequencies();
 
     auto& freq = StaticModel::shared().frequencies;
@@ -139,20 +142,35 @@ void DiagramWindow::writeDataToStream(QTextStream& out, SeriaModel const& seria)
         }
     }
 
+    float minUI = CurrentAppState::shared().minFromUI;
+    float maxUI = CurrentAppState::shared().maxFromUI;
 
     QString lastComponent = seria.getSeriaLastComponent();
     out << utf8Str("Название серии : ") << lastComponent << "\n";
     out << utf8Str("Количество объектов : ") << QString::number(numberOfAreas) << "\n";
     out << utf8Str("Абсолютный максимум : ") << QString::number(max,'f',1) << utf8Str("нм")
         << utf8Str(" Абсолютный минимум : ") << QString::number(min,'f',1) << utf8Str("нм") << "\n";
+    out << utf8Str("Выбранная нижняя граница : ") << QString::number(minUI,'f',1) << utf8Str("нм") <<
+           utf8Str(" Выбранная верхняя граница : ") << QString::number(maxUI,'f',1) << utf8Str("нм") << "\n";
     out << utf8Str("Размер кармана : ") << QString::number(fValue,'f',2) << utf8Str("нм") << "\n";
 
     auto& points = freq[seria.getFolderPath()];
 
     for (int i = 0; i < points.count(); ++i)
     {
-        out << QString::number(min + i*fValue,'f',2) << " " << QString::number(points[i]) << "\n";
+        float leftEdge = min + i*fValue;
+        if (!(leftEdge < minUI - fValue || leftEdge > maxUI + fValue))
+        {
+            out << QString::number(leftEdge,'f',2) << " " << QString::number(points[i]) << "\n";
+        }
+    }
 
+    out << "\n" << utf8Str("//////////////////Все значения////////////////////") << "\n \n";
+
+    for (int i = 0; i < points.count(); ++i)
+    {
+        float leftEdge = min + i*fValue;
+        out << QString::number(leftEdge,'f',2) << " " << QString::number(points[i]) << "\n";
     }
 }
 

@@ -106,9 +106,6 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
     frequenciesForExport.clear();
     frequenciesForExport.resize(numOfColumn);
 
-
-
-
     SeriaModel seria(seriaPath);
     QVector<QString> files = seria.getFiles();
 
@@ -125,7 +122,7 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
             float height = object.getMaxHeight().height;
             int column = 0;
 
-            while (height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
+            while (height > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) < max)
             {
                 ++column;
             }
@@ -137,6 +134,26 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
             }
         });
     }
+
+    float minUI = CurrentAppState::shared().minFromUI;
+    float maxUI = CurrentAppState::shared().maxFromUI;
+    int column = 0;
+
+    while (minUI > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
+    {
+        ++column;
+    }
+
+    CurrentAppState::shared().leftColumnEdge = column;
+
+    column = 0;
+
+    while (maxUI > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)
+    {
+        ++column;
+    }
+
+    CurrentAppState::shared().rightColumnEdge = column;
 
     int sum = std::accumulate(frequencies.begin(),frequencies.end(),0);
 

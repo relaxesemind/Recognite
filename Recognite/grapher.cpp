@@ -1,4 +1,5 @@
 #include "grapher.h"
+#include "Common/currentappstate.h"
 
 Grapher::Grapher()
 {
@@ -36,7 +37,10 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
 
         for (QPointF p : points)
         {
-            barSet->append(p.y());
+            if (!(p.x() < CurrentAppState::shared().leftColumnEdge - 1 || p.x() > CurrentAppState::shared().rightColumnEdge))
+            {
+                barSet->append(p.y());
+            }
         }
 
         barSet->setColor(barColor);
@@ -48,7 +52,16 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
     if (mode & GrapherMode::SplineVisible)
     {
         QSplineSeries *seriesLine = new QSplineSeries();
-        seriesLine->append(points.toList());
+
+        for (QPointF p : points)
+        {
+            if (!(p.x() < CurrentAppState::shared().leftColumnEdge - 1 || p.x() > CurrentAppState::shared().rightColumnEdge))
+            {
+                seriesLine->append(p);
+            }
+        }
+
+//        seriesLine->append(points.toList());
 
         QPen pen(lineColor);
         pen.setWidthF(2.5);
