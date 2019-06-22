@@ -86,6 +86,12 @@ void ImageView::showSlider(bool flag)
     opacitySlider->setHidden(!flag);
 }
 
+void ImageView::clearView()
+{
+    setImage(QPixmap());
+    setBinaryImage(QPixmap());
+}
+
 void ImageView::setupSlider()
 {
     QSlider *slider = new QSlider(Qt::Horizontal,this);

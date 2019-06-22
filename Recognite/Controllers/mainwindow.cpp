@@ -60,6 +60,7 @@ void MainWindow::setupListWidget()
 
 void MainWindow::setupImageView()
 {
+
     connect(ui->imageView,&ImageView::showHeightToolTip,this,[](const QPoint& coord, const QPoint& globalPos)
     {
         auto& models = StaticModel::shared().inputModels;
@@ -146,9 +147,12 @@ void MainWindow::addSeries()
 
 void MainWindow::buildImages()
 {
-    auto& sources = StaticModel::shared().sources;
-    auto& series = StaticModel::shared().series;
-    StaticModel::shared().inputModels.clear();
+    auto& model = StaticModel::shared();
+    auto& sources = model.sources;
+    auto& series = model.series;
+    model.sources.clear();
+    model.dests.clear();
+    model.inputModels.clear();
 
     ImagesBuiderProcess *process = new ImagesBuiderProcess(series);
 
@@ -325,6 +329,8 @@ void MainWindow::on_tableWidget_clicked(const QModelIndex &index)
     {
         CurrentAppState::shared().currentFilePath = files[id];
         updateImageViews();
+
+        qDebug() << CurrentAppState::shared().currentFilePath;
     }
 }
 
@@ -424,8 +430,6 @@ void MainWindow::showListMenuAtPos(QPoint pos)
     QAction *removeAction = new QAction(QString("Удалить серию"),this);
     removeAction->setShortcut(QKeySequence::Delete);
 
-
-
     connect(removeAction,&QAction::triggered,this,[&listWidget, this]
     {
         auto& series = StaticModel::shared().series;
@@ -459,8 +463,8 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         listWidget->clear();
         tableWidget->clear();
         tableWidget->setColumnCount(0);
-        imageView->setImage(QPixmap());
-        destView->setImage(QPixmap());
+        imageView->clearView();
+        destView->clearView();
         StaticModel::shared().dropModel();
     });
 
@@ -550,13 +554,23 @@ void MainWindow::on_action_2_triggered()//load several series
 
 void MainWindow::on_action_3_triggered()//save images
 {
+    QString path = QFileDialog::getExistingDirectory(this, tr("Выберите папку с серией изображений"),
+                                                 folderPath,
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+    if (path.isEmpty())
+    {
+        return;
+    }
+
+    qDebug() << "path = " << path;
+
     auto& sources = StaticModel::shared().sources;
     int i = 0;
     for (auto it = sources.begin(); it != sources.end(); ++it)
     {
         QImage image = it.value();
-//         img->save("c:\\1.jpg","JPG");
-        if (!image.save("C://dev/images" + QString::number(++i) + ".jpg","JPG"))
+        if (!image.save(path + "/" + QString::number(++i) + ".jpg","JPG"))
         {
             qDebug() << "failed";
         }

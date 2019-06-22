@@ -30,25 +30,6 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
     chart->legend()->show();
     chart->legend()->setAlignment(Qt::AlignRight);
 
-    if (mode & GrapherMode::BarVisible)
-    {
-        QBarSet *barSet = new QBarSet("",nullptr);
-        QBarSeries *seria = new QBarSeries();
-
-        for (QPointF p : points)
-        {
-            if (!(p.x() < CurrentAppState::shared().leftColumnEdge - 1 || p.x() > CurrentAppState::shared().rightColumnEdge))
-            {
-                barSet->append(p.y());
-            }
-        }
-
-        barSet->setColor(barColor);
-        seria->append(barSet);
-        seria->setName(title);
-        chart->addSeries(seria);
-    }
-
     if (mode & GrapherMode::SplineVisible)
     {
         QSplineSeries *seriesLine = new QSplineSeries();
@@ -61,8 +42,6 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
             }
         }
 
-//        seriesLine->append(points.toList());
-
         QPen pen(lineColor);
         pen.setWidthF(2.5);
 
@@ -71,6 +50,27 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
         chart->addSeries(seriesLine);
     }
 
+    if (mode & GrapherMode::BarVisible)
+    {
+        QScatterSeries *series = new QScatterSeries();
+        for (QPointF p : points)
+        {
+            if (!(p.x() < CurrentAppState::shared().leftColumnEdge - 1 || p.x() > CurrentAppState::shared().rightColumnEdge))
+            {
+                series->append(p);
+            }
+        }
+        series->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+        series->setMarkerSize(10.0);
+
+//        QColor color;
+//        color.setNamedColor("orange");
+        series->setColor(barColor);
+        chart->addSeries(series);
+    }
+
+
+//////////////////
     if (chart->series().isEmpty())
     {
         return;
@@ -79,22 +79,15 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
     chart->createDefaultAxes();
 
     QValueAxis *axisX = new QValueAxis();
-//    QValueAxis *axisY = new QValueAxis();
-
-//    axisY->setMax(maxY);
-//    axisY->setMin(minY);
 
     axisX->setMin(minX);
     axisX->setMax(maxX);
 
     axisX->setLabelFormat("%.1f nm");
-//    axisY->setLabelFormat("%.1f%%");
 
     axisX->setTickCount(8);
-//    axisY->setTickCount(8);
 
     chart->setAxisX(axisX);
-//    chart->setAxisY(axisY);
 }
 
 void Grapher::clearView()

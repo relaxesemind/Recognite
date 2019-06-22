@@ -23,7 +23,7 @@ class ImageView : public QGraphicsView
     Q_OBJECT
 
     using PXitem = QGraphicsPixmapItem;
-    using pItem = std::unique_ptr<PXitem>;
+    using pItem = std::shared_ptr<PXitem>;
 public:
     explicit ImageView(QWidget* widget = nullptr);
 
@@ -39,6 +39,7 @@ public slots:
     void setBinaryImage(const QPixmap& pixmap);
     void addGradientAxis(float min, float max);
     void showSlider(bool flag);
+    void clearView();
 
 private:
     void setupSlider();

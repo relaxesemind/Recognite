@@ -32,6 +32,8 @@ struct InputModel
         id = rvalue.id;
         path = rvalue.path;
         matrix = rvalue.matrix;
+        max = rvalue.max;
+        min = rvalue.min;
 
         return *this;
     }

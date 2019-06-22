@@ -206,10 +206,10 @@
   </action>
   <action name="barDiagramChecker">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>Вкл/Выкл Столбчатая диаграмма</string>
+    <string>Вкл/Выкл Точки</string>
    </property>
   </action>
   <action name="splineChecker">

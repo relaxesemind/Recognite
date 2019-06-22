@@ -38,6 +38,7 @@ DiagramWindow::~DiagramWindow()
 void DiagramWindow::on_horizontalSlider_valueChanged(int value)
 {
     ui->lineEdit->setText(QString::number(static_cast<float>(value ) / 100,'f',2));
+    recalc();
 }
 
 void DiagramWindow::on_lineEdit_editingFinished()
@@ -161,7 +162,7 @@ void DiagramWindow::writeDataToStream(QTextStream& out, SeriaModel const& seria)
         float leftEdge = min + i*fValue;
         if (!(leftEdge < minUI - fValue || leftEdge > maxUI + fValue))
         {
-            out << QString::number(leftEdge,'f',2) << " " << QString::number(points[i]) << "\n";
+            out << QString::number(points[i]) << "\n";
         }
     }
 
@@ -169,8 +170,7 @@ void DiagramWindow::writeDataToStream(QTextStream& out, SeriaModel const& seria)
 
     for (int i = 0; i < points.count(); ++i)
     {
-        float leftEdge = min + i*fValue;
-        out << QString::number(leftEdge,'f',2) << " " << QString::number(points[i]) << "\n";
+        out << QString::number(points[i]) << "\n";
     }
 }
 

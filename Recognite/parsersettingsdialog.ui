@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>303</width>
-    <height>189</height>
+    <width>254</width>
+    <height>202</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,6 +91,24 @@
      </item>
      <item>
       <widget class="QCheckBox" name="checkBox">
+       <property name="text">
+        <string>Да/Нет</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Формат &quot;NanoScope&quot;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBox_2">
        <property name="text">
         <string>Да/Нет</string>
        </property>

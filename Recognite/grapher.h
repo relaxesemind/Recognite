@@ -16,6 +16,7 @@
 #include <QDebug>
 #include <QRubberBand>
 #include <QtCharts/QValueAxis>
+#include <QtCharts/QScatterSeries>
 
 
 class GrapherMode

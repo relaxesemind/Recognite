@@ -12,8 +12,6 @@ template <
           >
 class ColorGenerator
 {
-
-
 public:
     ColorGenerator():dist(MIN,MAX)
     {

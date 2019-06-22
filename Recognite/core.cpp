@@ -12,8 +12,15 @@ QImage Core::imageFromTxtFile(const QString &path)
        return QImage();
    }
 
-   InputModel model = SettingsStorage::shared().commasParse ?
-               parser.inputModelFromFileWithCommas(path) : parser.inputModelFromFile(path);
+   ParseMode mode = SettingsStorage::shared().parseMode;
+   InputModel model; // = parser.inputModelFrom1024File(path);
+
+   switch (mode)
+   {
+   case ParseMode::commasMode:  model = parser.inputModelFromFileWithCommas(path); break;
+   case ParseMode::mode1024:    model = parser.inputModelFromNanoScope(path); break;
+   case ParseMode::defaultMode: model = parser.inputModelFromFileDefault(path); break;
+   }
 
    if (!model.isValid())
    {
@@ -174,7 +181,7 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
 
 void Core::calculateFrequenciesWithInterval(const QString &seriaPath, float interval)
 {
-    if (interval < 0.0001f)
+    if (interval < std::numeric_limits<float>::epsilon())
     {
         return;
     }

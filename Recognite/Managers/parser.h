@@ -18,8 +18,9 @@ class Parser : public QObject
 public:
      Parser() = default;
 
-     InputModel inputModelFromFile(const QString& path, int id = 0);
+     InputModel inputModelFromFileDefault(const QString& path, int id = 0);
      InputModel inputModelFromFileWithCommas(const QString& path, int id = 0);
+     InputModel inputModelFromNanoScope(const QString& path, int id = 0);
 
 };
 
