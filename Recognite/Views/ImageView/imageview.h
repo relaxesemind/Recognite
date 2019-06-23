@@ -26,6 +26,7 @@ class ImageView : public QGraphicsView
     using pItem = std::shared_ptr<PXitem>;
 public:
     explicit ImageView(QWidget* widget = nullptr);
+    GradientAxis *axis;
 
 protected:
     void wheelEvent(QWheelEvent *event)override;
@@ -53,7 +54,6 @@ private:
 
     QGraphicsProxyWidget *proxyAxis;
     QHBoxLayout *layout;
-    GradientAxis *axis;
 
     bool isAxisVisible;
     float minValue, maxValue;

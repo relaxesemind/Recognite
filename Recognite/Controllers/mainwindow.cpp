@@ -12,6 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setupListWidget();
     setupImageView();
+    setupProgressBar();
+    ui->tableWidget->setStyleSheet(QString( "background: #ECEFFE;" ));
+
+//    connect(&Core::shared(),&Core::imageBuildProgress,this,[this](int value)
+//    {
+//        this->ui->progressBar->setValue(value > 93 ? 0 : value);
+//    });
 }
 
 MainWindow::~MainWindow()
@@ -22,7 +29,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateProcessPercentage(int value)
 {
-    ui->progressBar->setValue(value == 100 ? 0 : value);
+    ui->progressBar->setValue(value >= 100 ? 0 : value);
 }
 
 void MainWindow::enableDiagramButton(bool flag)
@@ -33,6 +40,7 @@ void MainWindow::enableDiagramButton(bool flag)
 void MainWindow::setupListWidget()
 {
     QListWidget *listWidget = ui->listWidget;
+
     listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->imageView->addGradientAxis(0,0);
     connect(listWidget, &QListWidget::customContextMenuRequested,this, &MainWindow::showListMenuAtPos);
@@ -60,7 +68,12 @@ void MainWindow::setupListWidget()
 
 void MainWindow::setupImageView()
 {
-
+    ui->imageView->setStyleSheet(QString(
+                      "background-color: #d6dbff;"
+                      ));
+    ui->imageViewSelected->setStyleSheet(QString(
+                      "background-color: #d6dbff;"
+                      ));
     connect(ui->imageView,&ImageView::showHeightToolTip,this,[](const QPoint& coord, const QPoint& globalPos)
     {
         auto& models = StaticModel::shared().inputModels;
@@ -75,6 +88,21 @@ void MainWindow::setupImageView()
             }
         }
     });
+}
+
+void MainWindow::setupProgressBar()
+{
+    ui->progressBar->setStyleSheet(QString(
+                           "QProgressBar:horizontal {"
+//                           "border: 1px solid gray;"
+                           "border-radius: 3px;"
+                           "background: white;"
+                           "padding: 1px;"
+                           "}"
+                           "QProgressBar::chunk:horizontal {"
+                           "background: qlineargradient(x1: 0, y1: 0.5, x2: 1, y2: 0.5, stop: 0 #FF893D, stop: 1 white);"
+                           "}"
+    ));
 }
 
 void MainWindow::addSeria()
@@ -158,25 +186,26 @@ void MainWindow::buildImages()
 
     connect(process,&ImagesBuiderProcess::isRunning,this,[this](bool currentlyRunning)
     {
+        ui->processPushButton->setEnabled(!currentlyRunning);
         if (currentlyRunning)
         {
-            spinner = new WaitingSpinnerWidget(ui->imageView, Qt::ApplicationModal, true);
-            spinner->setRoundness(70.0);
-            spinner->setMinimumTrailOpacity(15.0);
-            spinner->setTrailFadePercentage(70.0);
-            spinner->setNumberOfLines(12);
-            spinner->setLineLength(12);
-            spinner->setLineWidth(4);
-            spinner->setInnerRadius(10);
-            spinner->setRevolutionsPerSecond(1);
-            spinner->start();
+            imageParseSpinner = new WaitingSpinnerWidget(ui->imageView, Qt::ApplicationModal, true);
+            imageParseSpinner->setRoundness(70.0);
+            imageParseSpinner->setMinimumTrailOpacity(15.0);
+            imageParseSpinner->setTrailFadePercentage(70.0);
+            imageParseSpinner->setNumberOfLines(12);
+            imageParseSpinner->setLineLength(12);
+            imageParseSpinner->setLineWidth(4);
+            imageParseSpinner->setInnerRadius(10);
+            imageParseSpinner->setRevolutionsPerSecond(1);
+            imageParseSpinner->start();
         }
-        else if (spinner != nullptr)
+        else if (imageParseSpinner != nullptr)
         {
-            spinner->stop();
+            imageParseSpinner->stop();
 
-            delete spinner;
-            spinner = nullptr;
+            delete imageParseSpinner;
+            imageParseSpinner = nullptr;
         }
     });
 
@@ -193,8 +222,8 @@ void MainWindow::buildImages()
         if (!sources.isEmpty())
         {
             auto firstIt = sources.begin();
-            ui->imageView->setImage(QPixmap::fromImage(firstIt.value()));
             CurrentAppState::shared().currentFilePath = firstIt.key();
+            ui->imageView->setImage(QPixmap::fromImage(firstIt.value()));
         }
         else
         {
@@ -219,9 +248,25 @@ void MainWindow::buildImages()
        ui->minHeightSlider->setMinimum(static_cast<int>(minNumber * 10));
        ui->maxHeightSlider->setValue(static_cast<int>(maxNumber * 10));
        ui->minHeightSlider->setValue(static_cast<int>((maxNumber - minNumber) / 4) * 10);
+
+
+    });
+
+    connect(process,&ImagesBuiderProcess::processPercent,this,[this](int value)
+    {
+        this->ui->progressBar->setValue(value >= 100 ? 0 : value);
     });
 
     this->pool->start(process);
+}
+
+void MainWindow::animateProgressBarFlash()
+{
+    QPropertyAnimation *animation = new QPropertyAnimation(ui->label, "color");
+    animation->setDuration(1000);
+    animation->setStartValue(QColor(0, 0, 0));
+    animation->setEndValue(QColor(240, 240, 240));
+    animation->start();
 }
 
 void MainWindow::on_loadTxtFiles_triggered()
@@ -374,7 +419,7 @@ void MainWindow::on_processPushButton_clicked()
     }
 
     dests.clear();
-    SelectingProcessManager *selectingTask = new SelectingProcessManager(std::move(paths));
+    SelectingProcessManager *selectingTask = new SelectingProcessManager(std::move(paths));   
 
     connect(selectingTask,&SelectingProcessManager::destPair,&StaticModel::shared(),&StaticModel::addDestPair);
     connect(selectingTask,&SelectingProcessManager::setEnableDiagram,this,&MainWindow::enableDiagramButton);
@@ -384,8 +429,30 @@ void MainWindow::on_processPushButton_clicked()
     {
         CurrentAppState::shared().selectingTaskIsRunning = isRunning;
         this->ui->processPushButton->setEnabled(!isRunning);
+        if (isRunning)
+        {
+            selectionSpinner = new WaitingSpinnerWidget(ui->imageViewSelected, Qt::ApplicationModal, true);
+            selectionSpinner->setRoundness(70.0);
+            selectionSpinner->setMinimumTrailOpacity(15.0);
+            selectionSpinner->setTrailFadePercentage(70.0);
+            selectionSpinner->setNumberOfLines(12);
+            selectionSpinner->setLineLength(12);
+            selectionSpinner->setLineWidth(4);
+            selectionSpinner->setInnerRadius(10);
+            selectionSpinner->setRevolutionsPerSecond(1);
+            selectionSpinner->setColor(Qt::white);
+            selectionSpinner->start();
+        }
+        else if (selectionSpinner != nullptr)
+        {
+            selectionSpinner->stop();
+
+            delete selectionSpinner;
+            selectionSpinner = nullptr;
+        }
     });
 
+    _selTask = selectingTask;
     pool->start(selectingTask);
 }
 
@@ -458,14 +525,20 @@ void MainWindow::showListMenuAtPos(QPoint pos)
         qDebug() << "После - " << series.count();
     });
 
+    QPushButton *diagramButton = ui->diagramPushButton;
+    QPushButton *processButton = ui->processPushButton;
+
     QAction *removeAll = new QAction(QString("Удалить все"),this);
-    connect(removeAll, &QAction::triggered, this, [&listWidget, &tableWidget, &imageView, &destView]{
+    connect(removeAll, &QAction::triggered, this, [&listWidget, &tableWidget, &imageView, &destView, &diagramButton, &processButton]
+    {
         listWidget->clear();
         tableWidget->clear();
         tableWidget->setColumnCount(0);
         imageView->clearView();
         destView->clearView();
         StaticModel::shared().dropModel();
+        diagramButton->setEnabled(false);
+        processButton->setEnabled(false);
     });
 
     menu.addActions({removeAction, addItemAction, addItemsAction,removeAll});
@@ -517,6 +590,7 @@ void MainWindow::on_listWidget_itemClicked(QListWidgetItem *item)
 void MainWindow::selectingTaskIsFinished()
 {
     updateViewWithSeria();
+    _selTask = nullptr;
 }
 
 void MainWindow::on_maxHeightLineEdit_editingFinished()
@@ -577,18 +651,10 @@ void MainWindow::on_action_3_triggered()//save images
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void MainWindow::on_processCancelButton_clicked()
+{
+    if (_selTask != nullptr)
+    {
+        _selTask->flag_stop = true;
+    }
+}

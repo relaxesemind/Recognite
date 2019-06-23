@@ -36,6 +36,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QTreeView>
+#include <QPropertyAnimation>
 
 
 
@@ -91,6 +92,8 @@ private slots:
 
     void on_action_3_triggered();
 
+    void on_processCancelButton_clicked();
+
 private:
     void updateTableWidget();
     void updateViewWithSeria();
@@ -98,16 +101,18 @@ private:
     void makeImageFromFilePath(const QString& path);
     void setupListWidget();
     void setupImageView();
+    void setupProgressBar();
     void addSeria();
     void addSeries();
     void buildImages();
+    void animateProgressBarFlash();
 
 private:
     Ui::MainWindow *ui;
     QThreadPool *pool;
-//    SelectingProcessManager *selectingTask;
+    SelectingProcessManager *_selTask;
     QString folderPath;
-    WaitingSpinnerWidget *spinner;
+    WaitingSpinnerWidget *imageParseSpinner, *selectionSpinner;
 };
 
 #endif // MAINWINDOW_H

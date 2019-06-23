@@ -48,6 +48,8 @@ private slots:
 
     void on_action_8_triggered();
 
+    void on_horizontalSlider_3_valueChanged(int value);
+
 private:
     Ui::DiagramWindow *ui;
     void drawGraph();
@@ -57,6 +59,7 @@ private:
     GrapherMode::Options mode;
     ColorGenerator<> gena;
     QMap<QString,QColor> barColors, splineColors;
+    float maxX,minX;
 };
 
 #endif // DIAGRAMWINDOW_H

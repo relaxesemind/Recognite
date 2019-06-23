@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 VERSION = 1.0.0.1
 QMAKE_TARGET_PRODUCT = RecogniteApp
-QMAKE_TARGET_COPYRIGHT = Egor Ivanov
+QMAKE_TARGET_COPYRIGHT = Egor Ivanov Olegovich
 QMAKE_TARGET_DESCRIPTION = SelectionObject
 
 CONFIG += c++14
@@ -74,7 +74,8 @@ HEADERS += \
     Common/colorgenerator.h \
     Managers/imagesbuiderprocess.h \
     Views/waitingspinnerwidget.h \
-    Managers/autoheightapproachproccess.h
+    Managers/autoheightapproachproccess.h \
+    Views/animatedprogressbar.h
 
 SOURCES += \
     Common/currentappstate.cpp \
@@ -97,4 +98,5 @@ SOURCES += \
     Common/colorgenerator.cpp \
     Managers/imagesbuiderprocess.cpp \
     Views/waitingspinnerwidget.cpp \
-    Managers/autoheightapproachproccess.cpp
+    Managers/autoheightapproachproccess.cpp \
+    Views/animatedprogressbar.cpp

@@ -28,6 +28,7 @@ public:
    SeriaModel currentSeria;
    bool selectingTaskIsRunning; // поток с выделением областей
    float minFromUI, maxFromUI; // min, max выбранные пользователем
+   float minXfromDiagramWindow, maxXfromDiagramWindow;
    ImageViewMode imageViewMode;
    int leftColumnEdge, rightColumnEdge; // края вектора столбиков частот в соответствии с float minFromUI, maxFromUI
 };

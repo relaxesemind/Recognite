@@ -26,8 +26,19 @@ DiagramWindow::DiagramWindow(QWidget *parent) :
        splineColors.insert(seria.getFolderPath(),gena.get());
     });
 
+    maxX =  CurrentAppState::shared().maxFromUI;
+    minX = CurrentAppState::shared().minFromUI;
+    CurrentAppState::shared().maxXfromDiagramWindow = maxX;
+    CurrentAppState::shared().minXfromDiagramWindow = minX;
+
     drawGraph();
     ui->gridLayout->addWidget(Grapher::shared().view,1,0);
+
+    auto& state = CurrentAppState::shared();
+
+    ui->horizontalSlider_3->setRange(static_cast<int>(state.minFromUI * 10),static_cast<int>(state.maxFromUI * 10));
+    ui->horizontalSlider_3->setValue(static_cast<int>(state.maxFromUI * 10));
+
 }
 
 DiagramWindow::~DiagramWindow()
@@ -65,8 +76,6 @@ void DiagramWindow::drawGraph()
 {
     Grapher::shared().clearView();
     pointsForGraph = Core::shared().calcPointsForGraph();
-    float max =  CurrentAppState::shared().maxFromUI;
-    float min = CurrentAppState::shared().minFromUI;
     auto pair = StaticModel::shared().getMaxMinFrequencies();
 
     auto& freq = StaticModel::shared().frequencies;
@@ -80,7 +89,7 @@ void DiagramWindow::drawGraph()
         sum += std::accumulate(f.begin(),f.end(),0);
     });
 
-    Grapher::shared().setXRange(min,max);
+    Grapher::shared().setXRange(minX,maxX);
     Grapher::shared().setYRange(static_cast<float>(yMin * 100) / static_cast<float>(sum),
                                 static_cast<float>(yMax * 100) / static_cast<float>(sum));
     Grapher::shared().updateState();
@@ -102,6 +111,11 @@ void DiagramWindow::drawGraph()
 
         QStringList legendTitle = it.key().split('/');
         QString title = legendTitle.last() + " N = " + QString::number(numberOfAreas);
+
+        if (title.size() > 30)
+        {
+            title = title.left(30);
+        }
 
         if (!legendTitle.isEmpty() and !it.value().isEmpty())
         {
@@ -249,16 +263,9 @@ void DiagramWindow::on_action_8_triggered()//random colors
     drawGraph();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+void DiagramWindow::on_horizontalSlider_3_valueChanged(int value)
+{
+    maxX = static_cast<float>(value) / 10.f;
+    CurrentAppState::shared().maxXfromDiagramWindow = maxX;
+    recalc();
+}

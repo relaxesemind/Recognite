@@ -7,9 +7,13 @@ ImageView::ImageView(QWidget* widget) : QGraphicsView(widget)
     currentScale = 1.0;
     opacity = 1.0;
     layout = nullptr;
+    axis = nullptr;
     this->setMouseTracking(true);
     setupSlider();
     showSlider(false);
+    setStyleSheet(QString(
+                      "background-color: #89AFD1;"
+                      ));
 }
 
 void ImageView::wheelEvent(QWheelEvent *event)
@@ -52,6 +56,20 @@ void ImageView::setImage(const QPixmap &pixmap)
     scene.addItem(currentImageItem.get());
     ImageView::centerOn(currentImageItem.get());
     ImageView::fitInView(currentImageItem.get(),Qt::KeepAspectRatio);
+
+    if (axis != nullptr)
+    {
+        auto& inputModels = StaticModel::shared().inputModels;
+        for (InputModel &model : inputModels)
+        {
+            if (model.path == CurrentAppState::shared().currentFilePath)
+            {
+                axis->setMaxLabelValue(model.max);
+                axis->setMinLabelValue(model.min);
+            }
+        }
+    }
+
     update();
 }
 
@@ -76,6 +94,8 @@ void ImageView::addGradientAxis(float min, float max)
     layout->setContentsMargins(0,0,0,0);
 
     GradientAxis *axisWidget = new GradientAxis(this);
+    axisWidget->setMaxLabelValue(maxValue);
+    axisWidget->setMinLabelValue(minValue);
     axis = axisWidget;
     layout->addWidget(axisWidget,1);
     this->setLayout(layout);

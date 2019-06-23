@@ -36,6 +36,10 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
 
         for (QPointF p : points)
         {
+//            if (!(p.x() < CurrentAppState::shared().leftColumnEdge - 1 || p.x() > CurrentAppState::shared().rightColumnEdge))
+//            {
+//                seriesLine->append(p);
+//            }
             if (!(p.x() < CurrentAppState::shared().leftColumnEdge - 1 || p.x() > CurrentAppState::shared().rightColumnEdge))
             {
                 seriesLine->append(p);
@@ -61,7 +65,8 @@ void Grapher::addGraph(const QVector<QPointF> &points, QString const& title, Gra
             }
         }
         series->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
-        series->setMarkerSize(10.0);
+        series->setMarkerSize(7.0);
+        series->setName("Точки ↑");
 
 //        QColor color;
 //        color.setNamedColor("orange");

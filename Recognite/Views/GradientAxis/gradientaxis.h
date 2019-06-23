@@ -9,6 +9,7 @@
 #include <QStyleOption>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QSpacerItem>
 
 
 class GradientAxis : public QWidget
@@ -23,6 +24,11 @@ protected:
 signals:
 
 public slots:
+    void setMinLabelValue(float value);
+    void setMaxLabelValue(float value);
+
+private:
+    QLabel *labelMin, *labelMax;
 };
 
 #endif // GRADIENTAXIS_H

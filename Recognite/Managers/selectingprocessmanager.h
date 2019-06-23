@@ -19,6 +19,8 @@ public:
     explicit SelectingProcessManager(QStringList&& paths);
     ~SelectingProcessManager(){}
 
+    bool flag_stop;
+
 protected:
     void run();
 

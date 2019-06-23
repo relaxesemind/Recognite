@@ -29,8 +29,8 @@ QImage Core::imageFromTxtFile(const QString &path)
 
    auto& inputModels = StaticModel::shared().inputModels;
 
-   int sizeY = model.sizeY();
-   int sizeX = model.sizeX();
+   int const sizeY = model.sizeY();
+   int const sizeX = model.sizeX();
 
    QImage image(sizeX,sizeY,QImage::Format_RGB32);
 
@@ -142,8 +142,8 @@ void Core::calculateFrequencies(const QString& seriaPath, int numOfColumn)
         });
     }
 
-    float minUI = CurrentAppState::shared().minFromUI;
-    float maxUI = CurrentAppState::shared().maxFromUI;
+    float minUI = CurrentAppState::shared().minXfromDiagramWindow;
+    float maxUI = CurrentAppState::shared().maxXfromDiagramWindow;
     int column = 0;
 
     while (minUI > min + singleInterval * (column + 1) and min + singleInterval * (column + 1) <= max)

@@ -13,15 +13,20 @@ void ImagesBuiderProcess::run()
     StaticModel::shared().inputModels.clear();
     sources.clear();
 
+    int numOfFiles = 0;
+    int filesProcessed = 0;
+
+    for (SeriaModel &seria : series)
+    {
+        numOfFiles += seria.getFiles().count();
+    }
+
     for (int i = 0; i < series.count(); ++i)
     {
         SeriaModel seria = series.at(i);
         QDir folder(seria.getFolderPath());
 
-        if (!folder.exists())
-        {
-            continue;
-        }
+        if (!folder.exists()){continue;}
 
         QVector<QString> filePaths = seria.getFiles();
 
@@ -30,16 +35,27 @@ void ImagesBuiderProcess::run()
              CurrentAppState::shared().currentSeria = seria;
         }
 
-        std::for_each(filePaths.begin(),filePaths.end(),[&sources](const QString& path)
+        for (int j = 0; j < filePaths.count(); ++j)
         {
+            QString path = filePaths.at(j);
             QImage image = Core::shared().imageFromTxtFile(path);
-
             if (std::find(sources.begin(),sources.end(), image) == sources.end())
             {
                 sources.insert(path,image);
             }
-        });
-    }
+            emit processPercent((++filesProcessed) * 100 / numOfFiles);
+        }
+
+//        std::for_each(filePaths.begin(),filePaths.end(),[&sources](const QString& path)
+//        {
+//            QImage image = Core::shared().imageFromTxtFile(path);
+
+//            if (std::find(sources.begin(),sources.end(), image) == sources.end())
+//            {
+//                sources.insert(path,image);
+//            }
+//        });
+        }
 
     emit isRunning(false);
     emit isDone(sources.count() ? true : false);
